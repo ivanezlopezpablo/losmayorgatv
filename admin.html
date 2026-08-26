@@ -161,8 +161,8 @@
     const GITHUB_USER = "ivanezlopezpablo";
     const GITHUB_REPO = "losmayorgatv";
     
-    // ⚠️ PEGA TU TOKEN CONVERTIDO A BASE64 O TU TOKEN DIRECTO SI ESTÁS PROBANDO LOCALMENTE
-    const ENCODED_TOKEN = "PEGA_AQUI_TU_TOKEN_ENCODED";
+    // PEGA TU TOKEN EN BASE64 AQUÍ (o el token directo ghp_...)
+    const ENCODED_TOKEN = "Z2hwX2VSa2dTZ3RhNXhMMmxRTWN2YWR6TFBPV0Q1U0oyRDNYNEVUMQ==";
     const token = ENCODED_TOKEN.startsWith("ghp_") ? ENCODED_TOKEN : atob(ENCODED_TOKEN);
 
     let productosList = [];
@@ -174,8 +174,12 @@
 
     async function loadProductsFromGitHub() {
       try {
+        // Fetch directo a la API con t=Date.now() para omitir caché
         const res = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/productos.json?t=${Date.now()}`, {
-          headers: { "Authorization": `Bearer ${token}` }
+          headers: { 
+            "Authorization": `Bearer ${token}`,
+            "Accept": "application/vnd.github.v3+json"
+          }
         });
         
         if (res.ok) {
@@ -184,9 +188,11 @@
           const decoded = decodeURIComponent(escape(atob(data.content)));
           productosList = JSON.parse(decoded);
           renderProductList();
+        } else {
+          console.error("Error al obtener productos.json:", res.status);
         }
       } catch (err) {
-        console.error("Error cargando productos:", err);
+        console.error("Error de conexión:", err);
       }
     }
 
@@ -197,7 +203,7 @@
         li.className = "product-item";
         li.dataset.id = p.id || index;
 
-        const imgUrl = `https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/main/imagenes/${p.imagen}`;
+        const imgUrl = `https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/main/imagenes/${p.imagen}?t=${Date.now()}`;
 
         li.innerHTML = `
           <div class="product-info">
@@ -277,7 +283,7 @@
 
     async function processSaveOrder() {
       const newOrderIds = Array.from(sortableList.children).map(li => li.dataset.id);
-      productosList.sort((a, b) => newOrderIds.indexOf(String(a.id)) - newOrderIds.indexOf(String(b.id)));
+      productosList.sort((a, b) => newOrderIds.indexOf(String(a.id || productosList.indexOf(a))) - newOrderIds.indexOf(String(b.id || productosList.indexOf(b))));
       await saveJsonToGitHub("Reordenar lista de productos");
     }
 
@@ -296,6 +302,7 @@
         const cleanName = file.name.replace(/[^a-zA-Z0-9.]/g, "_");
         const imgFileName = `${Date.now()}_${cleanName}`;
 
+        // 1. Subir Imagen
         const imgRes = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/imagenes/${imgFileName}`, {
           method: "PUT",
           headers: { "Authorization": `Bearer ${token}`, "Content-Type": "application/json" },
@@ -304,6 +311,7 @@
 
         if (!imgRes.ok) throw new Error("Error al subir la imagen");
 
+        // 2. Crear objeto de producto
         const newProd = {
           id: Date.now(),
           activo: true,
@@ -327,7 +335,7 @@
     }
 
     async function saveJsonToGitHub(commitMsg) {
-      showStatus("Guardando cambios...");
+      showStatus("Guardando cambios en GitHub...");
       try {
         const updatedJsonBase64 = btoa(unescape(encodeURIComponent(JSON.stringify(productosList, null, 2))));
 
@@ -338,8 +346,9 @@
         });
 
         if (res.ok) {
-          showStatus("¡Cambios aplicados en las pantallas!");
-          loadProductsFromGitHub();
+          showStatus("¡Cambios guardados con éxito!");
+          // Re-cargar inmediatamente desde la API
+          setTimeout(loadProductsFromGitHub, 1000);
         } else {
           throw new Error("Error actualizando productos.json");
         }
@@ -348,6 +357,7 @@
       }
     }
 
+    // Cargar productos al abrir
     loadProductsFromGitHub();
   </script>
 </body>
