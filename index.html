@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Vidriera Digital - Plantilla Dinámica</title>
+  <!-- Tipografía similar a la gráfica original -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Roboto+Condensed:wght@700&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      width: 100vw;
+      height: 100vh;
+      background-color: #000000;
+      overflow: hidden;
+      cursor: none;
+      font-family: 'Oswald', sans-serif;
+    }
+
+    #slider-container {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+    }
+
+    .slide {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      transition: opacity 1s ease-in-out;
+    }
+
+    .slide.active {
+      opacity: 1;
+      z-index: 10;
+    }
+
+    /* Imagen limpia de fondo */
+    .bg-image {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: 1;
+    }
+
+    /* Contenedor de Textos Superpuestos (Lado Izquierdo) */
+    .overlay-content {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 50%; /* Ocupa la mitad izquierda sobre la copa */
+      height: 100%;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding-left: 4vw;
+      color: #ffffff;
+      text-transform: uppercase;
+    }
+
+    /* Estilos del Título Principal "CERVEZA" */
+    .title-main {
+      font-size: 8.5vw;
+      font-weight: 700;
+      color: #38bdf8; /* Azul claro idéntico al diseño */
+      line-height: 0.85;
+      letter-spacing: -1px;
+    }
+
+    /* Subtítulo "CLÁSICA EN LATA" */
+    .subtitle {
+      font-size: 2.2vw;
+      color: #ffffff;
+      letter-spacing: 1px;
+      margin-top: 5px;
+      margin-bottom: 10px;
+    }
+
+    /* Fila de detalles: 473CC + PACK POR 6 UNIDADES */
+    .details-row {
+      display: flex;
+      align-items: baseline;
+      gap: 1.5vw;
+    }
+
+    .volume {
+      font-size: 8vw;
+      font-weight: 700;
+      color: #fef08a; /* Tono beige/amarillo claro */
+      line-height: 0.8;
+    }
+
+    .pack-info {
+      font-size: 3vw;
+      font-weight: 700;
+      color: #ffffff;
+      line-height: 0.95;
+      max-width: 12vw;
+    }
+
+    /* Sobrescribir precio dinámicamente si la imagen no lo incluye en el diseño */
+    .price-override {
+      position: absolute;
+      bottom: 4vh;
+      right: 4vw;
+      z-index: 2;
+      background-color: #ffffff;
+      padding: 0.5vw 2vw;
+      font-family: 'Roboto Condensed', sans-serif;
+      color: #000000;
+      font-size: 5vw;
+      font-weight: 700;
+      display: flex;
+      align-items: flex-start;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+
+    .price-override .cents {
+      font-size: 2.5vw;
+      text-decoration: underline;
+      margin-left: 2px;
+    }
+
+    #status-badge {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: rgba(220, 38, 38, 0.9);
+      color: #ffffff;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 14px;
+      z-index: 999;
+    }
+
+    .hidden { opacity: 0; pointer-events: none; }
+  </style>
+</head>
+<body>
+
+  <div id="slider-container"></div>
+  <div id="status-badge" class="hidden">Modo Offline</div>
+
+  <script>
+    const GITHUB_USER = "ivanezlopezpablo"; 
+    const GITHUB_REPO = "portankotv1"; 
+    const DURACION_SLIDE_MS = 7000;
+    const REFRESCAR_REPOS_MS = 5 * 60 * 1000;
+
+    const container = document.getElementById("slider-container");
+    const statusBadge = document.getElementById("status-badge");
+
+    let productos = [];
+    let currentIndex = 0;
+    let stepTimeout = null;
+
+    async function fetchProductsFromGitHub() {
+      const jsonUrl = `https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/main/productos.json?t=${new Date().getTime()}`;
+      
+      try {
+        const response = await fetch(jsonUrl);
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+        const data = await response.json();
+        statusBadge.classList.add("hidden");
+
+        if (data.length > 0 && JSON.stringify(data) !== JSON.stringify(productos)) {
+          productos = data;
+          updateDOMSlides();
+        }
+      } catch (error) {
+        console.warn("Error cargando productos.json:", error);
+        statusBadge.classList.remove("hidden");
+      }
+    }
+
+    function updateDOMSlides() {
+      clearTimeout(stepTimeout);
+      container.innerHTML = "";
+      
+      productos.forEach((prod, index) => {
+        const slide = document.createElement("div");
+        slide.classList.add("slide");
+        if (index === 0) slide.classList.add("active");
+
+        const imgUrl = `https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/main/imagenes/${prod.imagen}`;
+
+        slide.innerHTML = `
+          <img src="${imgUrl}" class="bg-image" alt="${prod.titulo}">
+          
+          <div class="overlay-content">
+            <div class="title-main">${prod.titulo}</div>
+            <div class="subtitle">${prod.subtitulo}</div>
+            <div class="details-row">
+              <div class="volume">${prod.volumen}</div>
+              <div class="pack-info">${prod.presentacion}</div>
+            </div>
+          </div>
+
+          ${prod.precioEntero ? `
+            <div class="price-override">
+              $ ${prod.precioEntero}<span class="cents">${prod.precioDecimal || '00'}</span>
+            </div>
+          ` : ''}
+        `;
+
+        container.appendChild(slide);
+      });
+
+      currentIndex = 0;
+      playCurrentSlide();
+    }
+
+    function playCurrentSlide() {
+      const slides = document.querySelectorAll(".slide");
+      if (slides.length === 0) return;
+
+      stepTimeout = setTimeout(() => {
+        nextSlide();
+      }, DURACION_SLIDE_MS);
+    }
+
+    function nextSlide() {
+      const slides = document.querySelectorAll(".slide");
+      if (slides.length <= 1) return;
+
+      slides[currentIndex].classList.remove("active");
+      currentIndex = (currentIndex + 1) % slides.length;
+      slides[currentIndex].classList.add("active");
+      
+      playCurrentSlide();
+    }
+
+    fetchProductsFromGitHub();
+    setInterval(fetchProductsFromGitHub, REFRESCAR_REPOS_MS);
+  </script>
+</body>
+</html>
