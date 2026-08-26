@@ -5,7 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Panel de Control - Los Mayorga TV</title>
 
-  <!-- SortableJS para Drag & Drop -->
+  <!-- SDKs de Firebase v9 (Compatibilitat para CDN) y SortableJS -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
 
   <style>
@@ -123,7 +126,7 @@
     </div>
   </div>
 
-  <!-- MODAL DE CONFIRMACIÓN PASO 1 -->
+  <!-- MODALES DE CONFIRMACIÓN Y RECONFIRMACIÓN -->
   <div id="modal-confirm" class="modal-overlay hidden">
     <div class="modal-box">
       <h3 id="modal-title">¿Estás seguro?</h3>
@@ -135,7 +138,6 @@
     </div>
   </div>
 
-  <!-- MODAL DE RECONFIRMACIÓN PASO 2 -->
   <div id="modal-reconfirm" class="modal-overlay hidden">
     <div class="modal-box">
       <h3 style="color:#ef4444;">¡RECONFIRMACIÓN!</h3>
@@ -148,7 +150,6 @@
   </div>
 
   <script>
-    // Verificar autorización de sesión
     if (sessionStorage.getItem("internal_auth_mayorga") !== "true") {
       window.location.href = "login.html";
     }
@@ -158,56 +159,47 @@
       window.location.href = "login.html";
     }
 
-    const GITHUB_USER = "ivanezlopezpablo";
-    const GITHUB_REPO = "losmayorgatv";
-    
-    // PEGA TU TOKEN EN BASE64 AQUÍ (o el token directo ghp_...)
-    const ENCODED_TOKEN = "Z2hwX2VSa2dTZ3RhNXhMMmxRTWN2YWR6TFBPV0Q1U0oyRDNYNEVUMQ==";
-    const token = ENCODED_TOKEN.startsWith("ghp_") ? ENCODED_TOKEN : atob(ENCODED_TOKEN);
+    // Configuración de Firebase - losmayorgatv
+    const firebaseConfig = {
+      apiKey: "AIzaSyAhTFpjaWhAUnA3P5_pXGNgjAUlKEtDXAA",
+      authDomain: "losmayorgatv.firebaseapp.com",
+      projectId: "losmayorgatv",
+      storageBucket: "losmayorgatv.firebasestorage.app",
+      messagingSenderId: "859965884915",
+      appId: "1:859965884915:web:0610001dc222438ae7ea86",
+      measurementId: "G-3Y1B4PKTF6"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const storage = firebase.storage();
 
     let productosList = [];
-    let productosSha = "";
     let pendingAction = null;
 
     const sortableList = document.getElementById('product-list');
     new Sortable(sortableList, { animation: 150 });
 
-    async function loadProductsFromGitHub() {
-      try {
-        // Fetch directo a la API con t=Date.now() para omitir caché
-        const res = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/productos.json?t=${Date.now()}`, {
-          headers: { 
-            "Authorization": `Bearer ${token}`,
-            "Accept": "application/vnd.github.v3+json"
-          }
+    function loadProductsFromFirebase() {
+      db.collection("productos").orderBy("orden", "asc").onSnapshot(snapshot => {
+        productosList = [];
+        snapshot.forEach(doc => {
+          productosList.push({ id: doc.id, ...doc.data() });
         });
-        
-        if (res.ok) {
-          const data = await res.json();
-          productosSha = data.sha;
-          const decoded = decodeURIComponent(escape(atob(data.content)));
-          productosList = JSON.parse(decoded);
-          renderProductList();
-        } else {
-          console.error("Error al obtener productos.json:", res.status);
-        }
-      } catch (err) {
-        console.error("Error de conexión:", err);
-      }
+        renderProductList();
+      }, err => console.error("Error Firebase:", err));
     }
 
     function renderProductList() {
       sortableList.innerHTML = "";
-      productosList.forEach((p, index) => {
+      productosList.forEach((p) => {
         const li = document.createElement("li");
         li.className = "product-item";
-        li.dataset.id = p.id || index;
-
-        const imgUrl = `https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/main/imagenes/${p.imagen}?t=${Date.now()}`;
+        li.dataset.id = p.id;
 
         li.innerHTML = `
           <div class="product-info">
-            <img src="${imgUrl}" class="product-thumb">
+            <img src="${p.imagenUrl}" class="product-thumb">
             <div class="product-details">
               <h4>${p.titulo} - $${p.precioEntero}</h4>
               <p>${p.subtitulo || ''} ${p.fechaProgramada ? '| 🕒 Prog: ' + p.fechaProgramada.replace('T', ' ') : ''}</p>
@@ -215,11 +207,11 @@
           </div>
           
           <label class="switch" title="Activar/Desactivar">
-            <input type="checkbox" ${p.activo !== false ? 'checked' : ''} onchange="requestToggleActive(${p.id || index}, this.checked)">
+            <input type="checkbox" ${p.activo !== false ? 'checked' : ''} onchange="requestToggleActive('${p.id}', this.checked)">
             <span class="slider"></span>
           </label>
 
-          <button class="btn-danger" onclick="requestDelete(${p.id || index})">Eliminar</button>
+          <button class="btn-danger" onclick="requestDelete('${p.id}')">Eliminar</button>
         `;
         sortableList.appendChild(li);
       });
@@ -248,7 +240,6 @@
       document.getElementById("modal-confirm").classList.add("hidden");
       document.getElementById("modal-reconfirm").classList.add("hidden");
       pendingAction = null;
-      loadProductsFromGitHub();
     }
 
     async function executeAction() {
@@ -258,107 +249,74 @@
 
     function requestUpload() {
       if (!document.getElementById("prod-img").files[0]) return alert("Selecciona una imagen");
-      openModal("¿Publicar Producto?", "La oferta se subirá a GitHub y estará disponible en las pantallas.", processUpload);
+      openModal("¿Publicar Producto?", "La oferta se subirá a Firebase y estará disponible en las pantallas.", processUpload);
     }
 
     function requestSaveOrder() {
-      openModal("¿Guardar Nuevo Orden?", "El orden de reproducción cambiará en todas las Smart TV.", processSaveOrder);
+      openModal("¿Guardar Nuevo Orden?", "El orden de reproducción cambiará inmediatamente en todas las TV.", processSaveOrder);
     }
 
     function requestToggleActive(id, newState) {
       const stateText = newState ? "ACTIVAR" : "DESACTIVAR";
       openModal(`¿${stateText} Producto?`, `El producto ${newState ? 'volverá a mostrarse' : 'se ocultará'} en la TV.`, () => {
-        const prod = productosList.find((p, idx) => (p.id || idx) == id);
-        if (prod) prod.activo = newState;
-        return saveJsonToGitHub("Cambiar estado activo/inactivo");
+        return db.collection("productos").doc(id).update({ activo: newState });
       });
     }
 
     function requestDelete(id) {
-      openModal("¿ELIMINAR PRODUCTO?", "Esta acción es irreversible y quitará el producto del sistema.", () => {
-        productosList = productosList.filter((p, idx) => (p.id || idx) != id);
-        return saveJsonToGitHub("Eliminar producto");
+      openModal("¿ELIMINAR PRODUCTO?", "Esta acción quitará el producto de las pantallas.", () => {
+        return db.collection("productos").doc(id).delete();
       });
     }
 
     async function processSaveOrder() {
-      const newOrderIds = Array.from(sortableList.children).map(li => li.dataset.id);
-      productosList.sort((a, b) => newOrderIds.indexOf(String(a.id || productosList.indexOf(a))) - newOrderIds.indexOf(String(b.id || productosList.indexOf(b))));
-      await saveJsonToGitHub("Reordenar lista de productos");
+      showStatus("Guardando nuevo orden...");
+      const batch = db.batch();
+      const items = Array.from(sortableList.children);
+      
+      items.forEach((li, index) => {
+        const ref = db.collection("productos").doc(li.dataset.id);
+        batch.update(ref, { orden: index });
+      });
+
+      await batch.commit();
+      showStatus("¡Orden actualizado con éxito!");
+      closeModal();
     }
 
-    const toBase64 = file => new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => resolve(reader.result.split(',')[1]);
-      reader.onerror = err => reject(err);
-    });
-
     async function processUpload() {
-      showStatus("Subiendo oferta...");
+      showStatus("Subiendo oferta e imagen a Firebase...");
       try {
         const file = document.getElementById("prod-img").files[0];
-        const base64Content = await toBase64(file);
-        const cleanName = file.name.replace(/[^a-zA-Z0-9.]/g, "_");
-        const imgFileName = `${Date.now()}_${cleanName}`;
+        const fileName = `${Date.now()}_${file.name.replace(/[^a-zA-Z0-9.]/g, "_")}`;
+        
+        const storageRef = storage.ref(`imagenes/${fileName}`);
+        const snapshot = await storageRef.put(file);
+        const downloadURL = await snapshot.ref.getDownloadURL();
 
-        // 1. Subir Imagen
-        const imgRes = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/imagenes/${imgFileName}`, {
-          method: "PUT",
-          headers: { "Authorization": `Bearer ${token}`, "Content-Type": "application/json" },
-          body: JSON.stringify({ message: `Subir imagen ${imgFileName}`, content: base64Content })
-        });
-
-        if (!imgRes.ok) throw new Error("Error al subir la imagen");
-
-        // 2. Crear objeto de producto
-        const newProd = {
-          id: Date.now(),
+        await db.collection("productos").add({
           activo: true,
-          fechaProgramada: document.getElementById("prod-date").value || null,
-          imagen: imgFileName,
+          orden: productosList.length,
+          imagenUrl: downloadURL,
           titulo: document.getElementById("prod-title").value.toUpperCase(),
           subtitulo: document.getElementById("prod-sub").value.toUpperCase(),
           volumen: document.getElementById("prod-vol").value.toUpperCase(),
           presentacion: document.getElementById("prod-pack").value.toUpperCase(),
           precioEntero: document.getElementById("prod-price-int").value,
-          precioDecimal: document.getElementById("prod-price-dec").value
-        };
-
-        productosList.push(newProd);
-        await saveJsonToGitHub("Añadir nuevo producto");
-        document.getElementById("product-form").reset();
-        showStatus("¡Oferta publicada exitosamente!");
-      } catch (err) {
-        showStatus("Error: " + err.message, true);
-      }
-    }
-
-    async function saveJsonToGitHub(commitMsg) {
-      showStatus("Guardando cambios en GitHub...");
-      try {
-        const updatedJsonBase64 = btoa(unescape(encodeURIComponent(JSON.stringify(productosList, null, 2))));
-
-        const res = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/productos.json`, {
-          method: "PUT",
-          headers: { "Authorization": `Bearer ${token}`, "Content-Type": "application/json" },
-          body: JSON.stringify({ message: commitMsg, content: updatedJsonBase64, sha: productosSha })
+          precioDecimal: document.getElementById("prod-price-dec").value || "00",
+          fechaProgramada: document.getElementById("prod-date").value || null,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
         });
 
-        if (res.ok) {
-          showStatus("¡Cambios guardados con éxito!");
-          // Re-cargar inmediatamente desde la API
-          setTimeout(loadProductsFromGitHub, 1000);
-        } else {
-          throw new Error("Error actualizando productos.json");
-        }
+        document.getElementById("product-form").reset();
+        showStatus("¡Oferta publicada exitosamente!");
+        closeModal();
       } catch (err) {
         showStatus("Error: " + err.message, true);
       }
     }
 
-    // Cargar productos al abrir
-    loadProductsFromGitHub();
+    loadProductsFromFirebase();
   </script>
 </body>
 </html>
