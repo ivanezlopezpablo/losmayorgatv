@@ -120,4 +120,75 @@
         const fileName = `${Date.now()}_${file.name.replace(/\s+/g, '_')}`;
 
         // 1. Subir la imagen a la carpeta /imagenes en GitHub mediante API
-        const imgApiUrl = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB
+        const imgApiUrl = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/imagenes/${fileName}`;
+        const imgResponse = await fetch(imgApiUrl, {
+          method: "PUT",
+          headers: {
+            "Authorization": `token ${token}`,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            message: `Añadir imagen ${fileName}`,
+            content: base64Content
+          })
+        });
+
+        if (!imgResponse.ok) throw new Error("Error al subir la imagen a GitHub");
+
+        // 2. Obtener el archivo productos.json actual
+        const jsonApiUrl = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/productos.json`;
+        const jsonGetResp = await fetch(jsonApiUrl, {
+          headers: { "Authorization": `token ${token}` }
+        });
+
+        let currentProducts = [];
+        let sha = "";
+
+        if (jsonGetResp.ok) {
+          const jsonFileData = await jsonGetResp.json();
+          sha = jsonFileData.sha;
+          const decodedContent = decodeURIComponent(escape(atob(jsonFileData.content)));
+          currentProducts = JSON.parse(decodedContent);
+        }
+
+        // 3. Crear el nuevo objeto de producto y agregarlo a la lista
+        const newProduct = {
+          imagen: fileName,
+          titulo: document.getElementById("prod-title").value.toUpperCase(),
+          subtitulo: document.getElementById("prod-sub").value.toUpperCase(),
+          volumen: document.getElementById("prod-vol").value.toUpperCase(),
+          presentacion: document.getElementById("prod-pack").value.toUpperCase(),
+          precioEntero: document.getElementById("prod-price-int").value,
+          precioDecimal: document.getElementById("prod-price-dec").value
+        };
+
+        currentProducts.push(newProduct);
+
+        // 4. Guardar el productos.json actualizado en GitHub
+        const updatedJsonBase64 = btoa(unescape(encodeURIComponent(JSON.stringify(currentProducts, null, 2))));
+        
+        const jsonPutResp = await fetch(jsonApiUrl, {
+          method: "PUT",
+          headers: {
+            "Authorization": `token ${token}`,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            message: `Actualizar productos.json con ${newProduct.titulo}`,
+            content: updatedJsonBase64,
+            sha: sha || undefined
+          })
+        });
+
+        if (!jsonPutResp.ok) throw new Error("Error al actualizar productos.json");
+
+        showStatus("¡Producto cargado exitosamente! Las TV se actualizarán en breve.");
+        document.getElementById("product-form").reset();
+
+      } catch (err) {
+        showStatus("Error: " + err.message, true);
+      }
+    }
+  </script>
+</body>
+</html>
