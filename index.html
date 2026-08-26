@@ -2,13 +2,15 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Vidriera Digital - Los Mayorga TV</title>
-  
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
   <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Roboto+Condensed:wght@700;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+
+  <!-- Firebase v9 (Compatibilidad CDN) -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -32,11 +34,21 @@
   <div id="slider-container"></div>
 
   <script>
-    const GITHUB_USER = "ivanezlopezpablo"; 
-    const GITHUB_REPO = "losmayorgatv"; 
-    const DURACION_SLIDE_MS = 7000;
-    const REFRESCAR_REPOS_MS = 3 * 60 * 1000;
+    // Configuración de Firebase - losmayorgatv
+    const firebaseConfig = {
+      apiKey: "AIzaSyAhTFpjaWhAUnA3P5_pXGNgjAUlKEtDXAA",
+      authDomain: "losmayorgatv.firebaseapp.com",
+      projectId: "losmayorgatv",
+      storageBucket: "losmayorgatv.firebasestorage.app",
+      messagingSenderId: "859965884915",
+      appId: "1:859965884915:web:0610001dc222438ae7ea86",
+      measurementId: "G-3Y1B4PKTF6"
+    };
 
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    const DURACION_SLIDE_MS = 7000;
     const TRANSICIONES = [
       { in: "animate__fadeInRight", out: "animate__fadeOutLeft" },
       { in: "animate__zoomIn", out: "animate__zoomOut" },
@@ -50,45 +62,34 @@
     let stepTimeout = null;
     let transitionIndex = 0;
 
-    async function fetchProductsFromGitHub() {
-      const jsonUrl = `https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/main/productos.json?t=${new Date().getTime()}`;
-      
-      try {
-        const response = await fetch(jsonUrl);
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    db.collection("productos").orderBy("orden", "asc").onSnapshot(snapshot => {
+      const now = new Date();
+      const rawData = [];
+      snapshot.forEach(doc => rawData.push({ id: doc.id, ...doc.data() }));
 
-        const rawData = await response.json();
-        const now = new Date();
+      const filtered = rawData.filter(p => {
+        const isActivo = p.activo !== false;
+        const isDateValid = !p.fechaProgramada || new Date(p.fechaProgramada) <= now;
+        return isActivo && isDateValid;
+      });
 
-        const filteredData = rawData.filter(p => {
-          const isActivo = p.activo !== false;
-          const isDateValid = !p.fechaProgramada || new Date(p.fechaProgramada) <= now;
-          return isActivo && isDateValid;
-        });
-
-        if (filteredData.length > 0 && JSON.stringify(filteredData) !== JSON.stringify(productos)) {
-          productos = filteredData;
-          updateDOMSlides();
-        }
-      } catch (error) {
-        console.warn("Error cargando productos.json:", error);
+      if (filtered.length > 0 && JSON.stringify(filtered) !== JSON.stringify(productos)) {
+        productos = filtered;
+        updateDOMSlides();
       }
-    }
+    });
 
     function updateDOMSlides() {
       clearTimeout(stepTimeout);
       container.innerHTML = "";
-      
+
       productos.forEach((prod, index) => {
         const slide = document.createElement("div");
         slide.classList.add("slide", "animate__animated");
         if (index === 0) slide.classList.add("active");
 
-        const imgUrl = `https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/main/imagenes/${prod.imagen}`;
-
         slide.innerHTML = `
-          <img src="${imgUrl}" class="bg-image" alt="${prod.titulo}">
-          
+          <img src="${prod.imagenUrl}" class="bg-image">
           <div class="overlay-content">
             <div class="title-main animate__animated animate__bounceInLeft animate__delay-1s">${prod.titulo}</div>
             <div class="subtitle animate__animated animate__fadeInLeft animate__delay-1s">${prod.subtitulo || ''}</div>
@@ -97,12 +98,10 @@
               <div class="pack-info animate__animated animate__fadeInUp animate__delay-1s">${prod.presentacion || ''}</div>
             </div>
           </div>
-
           <div class="price-override animate__animated animate__pulse animate__infinite">
             $ ${prod.precioEntero}<span class="cents">${prod.precioDecimal || '00'}</span>
           </div>
         `;
-
         container.appendChild(slide);
       });
 
@@ -112,7 +111,7 @@
 
     function playCurrentSlide() {
       const slides = document.querySelectorAll(".slide");
-      if (slides.length === 0) return;
+      if (slides.length <= 1) return;
 
       stepTimeout = setTimeout(() => {
         nextSlide();
@@ -139,9 +138,6 @@
         playCurrentSlide();
       }, 800);
     }
-
-    fetchProductsFromGitHub();
-    setInterval(fetchProductsFromGitHub, REFRESCAR_REPOS_MS);
   </script>
 </body>
 </html>
