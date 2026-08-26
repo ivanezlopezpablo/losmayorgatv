@@ -2,147 +2,352 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Vidriera Digital - Los Mayorga TV</title>
-  
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Roboto+Condensed:wght@700;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panel de Administración Avanzado - Los Mayorga TV</title>
+
+  <!-- Librería externa para Arrastrar y Soltar (SortableJS) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
 
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    html, body { width: 100vw; height: 100vh; background-color: #000; overflow: hidden; cursor: none; font-family: 'Oswald', sans-serif; }
-    #slider-container { position: relative; width: 100vw; height: 100vh; }
-    .slide { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none; }
-    .slide.active { display: block; z-index: 10; }
-    .bg-image { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; }
-    .overlay-content { position: absolute; top: 0; left: 0; width: 50%; height: 100%; z-index: 2; display: flex; flex-direction: column; justify-content: center; padding-left: 4vw; color: #fff; text-transform: uppercase; }
-    .title-main { font-size: 8.5vw; font-weight: 700; color: #38bdf8; line-height: 0.85; text-shadow: 3px 3px 15px rgba(0,0,0,0.8); }
-    .subtitle { font-size: 2.2vw; color: #fff; margin-top: 5px; text-shadow: 2px 2px 8px rgba(0,0,0,0.8); }
-    .details-row { display: flex; align-items: baseline; gap: 1.5vw; margin-top: 10px; }
-    .volume { font-size: 8vw; font-weight: 700; color: #fef08a; line-height: 0.8; text-shadow: 3px 3px 12px rgba(0,0,0,0.8); }
-    .pack-info { font-size: 3vw; font-weight: 700; color: #fff; line-height: 0.95; max-width: 12vw; text-shadow: 2px 2px 8px rgba(0,0,0,0.8); }
-    .price-override { position: absolute; bottom: 4vh; right: 4vw; z-index: 3; background-color: #fff; padding: 0.5vw 2vw; font-family: 'Roboto Condensed', sans-serif; color: #000; font-size: 5.5vw; font-weight: 900; display: flex; align-items: flex-start; box-shadow: 0 10px 25px rgba(0,0,0,0.5); border-radius: 4px; }
-    .price-override .cents { font-size: 2.8vw; text-decoration: underline; margin-left: 3px; }
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; }
+    body { background: #0f172a; color: #f8fafc; padding: 20px; display: flex; justify-content: center; }
+    .container { width: 100%; max-width: 800px; }
+    .card { background: #1e293b; padding: 25px; border-radius: 12px; margin-bottom: 25px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+    h2 { color: #38bdf8; margin-bottom: 20px; text-align: center; }
+    
+    .form-group { margin-bottom: 15px; }
+    label { display: block; margin-bottom: 5px; font-size: 14px; color: #94a3b8; }
+    input, select { width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #334155; background: #0f172a; color: #fff; font-size: 15px; }
+    .row { display: flex; gap: 15px; }
+    .row .form-group { flex: 1; }
+
+    button { padding: 10px 18px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+    .btn-primary { background: #0284c7; color: #fff; width: 100%; padding: 12px; font-size: 16px; }
+    .btn-primary:hover { background: #0369a1; }
+    .btn-save-order { background: #16a34a; color: #fff; margin-bottom: 15px; }
+    .btn-danger { background: #dc2626; color: #fff; }
+
+    /* Lista de Productos y Drag & Drop */
+    .product-list { list-style: none; }
+    .product-item { background: #334155; padding: 15px; border-radius: 8px; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; gap: 15px; cursor: grab; }
+    .product-item:active { cursor: grabbing; }
+    .product-info { display: flex; align-items: center; gap: 15px; flex: 1; }
+    .product-thumb { width: 60px; height: 60px; object-fit: cover; border-radius: 6px; background: #0f172a; }
+    .product-details h4 { font-size: 16px; color: #fff; }
+    .product-details p { font-size: 13px; color: #94a3b8; }
+
+    /* Switch On/Off */
+    .switch { position: relative; display: inline-block; width: 50px; height: 26px; flex-shrink: 0; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #64748b; transition: .4s; border-radius: 34px; }
+    .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
+    input:checked + .slider { background-color: #22c55e; }
+    input:checked + .slider:before { transform: translateX(24px); }
+
+    /* Modal emergente de confirmación */
+    .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.8); display: flex; justify-content: center; align-items: center; z-index: 9999; }
+    .modal-box { background: #1e293b; padding: 25px; border-radius: 12px; max-width: 400px; width: 90%; text-align: center; border: 1px solid #475569; }
+    .modal-box h3 { color: #f8fafc; margin-bottom: 10px; }
+    .modal-box p { color: #94a3b8; font-size: 14px; margin-bottom: 20px; }
+    .modal-actions { display: flex; gap: 10px; justify-content: center; }
+
+    .hidden { display: none !important; }
+    #status { margin-top: 15px; padding: 10px; border-radius: 6px; text-align: center; }
+    .success { background: #15803d; }
+    .error { background: #b91c1c; }
   </style>
 </head>
 <body>
 
-  <div id="slider-container"></div>
+  <div class="container">
+
+    <!-- AUTENTICACIÓN DE TOKEN (PRIMERA VEZ) -->
+    <div id="token-card" class="card">
+      <h2>Acceso Administrador</h2>
+      <div class="form-group">
+        <label>Personal Access Token de GitHub</label>
+        <input type="password" id="gh-token" placeholder="ghp_xxxxxxxxxxxx">
+      </div>
+      <button class="btn-primary" onclick="saveToken()">Ingresar al Control</button>
+    </div>
+
+    <!-- PANEL PRINCIPAL -->
+    <div id="admin-panel" class="hidden">
+
+      <!-- CARGAR NUEVA OFERTA -->
+      <div class="card">
+        <h2>Cargar Nueva Oferta</h2>
+        <form id="product-form">
+          <div class="form-group">
+            <label>Imagen Limpia del Producto</label>
+            <input type="file" id="prod-img" accept="image/*" required>
+          </div>
+          <div class="row">
+            <div class="form-group">
+              <label>Título (ej. CERVEZA)</label>
+              <input type="text" id="prod-title" required placeholder="CERVEZA">
+            </div>
+            <div class="form-group">
+              <label>Subtítulo (ej. CLÁSICA EN LATA)</label>
+              <input type="text" id="prod-sub" placeholder="CLÁSICA EN LATA">
+            </div>
+          </div>
+          <div class="row">
+            <div class="form-group">
+              <label>Volumen (ej. 473CC)</label>
+              <input type="text" id="prod-vol" placeholder="473CC">
+            </div>
+            <div class="form-group">
+              <label>Presentación (ej. PACK POR 6)</label>
+              <input type="text" id="prod-pack" placeholder="PACK POR 6 UNIDADES">
+            </div>
+          </div>
+          <div class="row">
+            <div class="form-group">
+              <label>Precio Entero (ej. 21.076)</label>
+              <input type="text" id="prod-price-int" required placeholder="21.076">
+            </div>
+            <div class="form-group">
+              <label>Precio Decimales</label>
+              <input type="text" id="prod-price-dec" value="90">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Programar Publicación (Opcional - Dejar vacío para publicar ya)</label>
+            <input type="datetime-local" id="prod-date">
+          </div>
+          <button type="button" class="btn-primary" onclick="requestUpload()">Publicar Oferta</button>
+        </form>
+        <div id="status" class="hidden"></div>
+      </div>
+
+      <!-- LISTA DE PRODUCTOS Y REORDENAR -->
+      <div class="card">
+        <h2>Productos en Pantalla</h2>
+        <p style="font-size: 13px; color: #94a3b8; margin-bottom: 15px;">Arrastra las tarjetas para cambiar el orden de reproducción en las Smart TV.</p>
+        <button class="btn-save-order" onclick="requestSaveOrder()">Guardar Nuevo Orden</button>
+        
+        <ul id="product-list" class="product-list">
+          <!-- Se llena dinámicamente -->
+        </ul>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- MODAL DE CONFIRMACIÓN PASO 1 -->
+  <div id="modal-confirm" class="modal-overlay hidden">
+    <div class="modal-box">
+      <h3 id="modal-title">¿Estás seguro?</h3>
+      <p id="modal-msg">Esta acción actualizará las pantallas de los televisores.</p>
+      <div class="modal-actions">
+        <button class="btn-primary" style="background:#475569;" onclick="closeModal()">Cancelar</button>
+        <button class="btn-primary" onclick="confirmStep1()">Continuar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL DE RECONFIRMACIÓN PASO 2 -->
+  <div id="modal-reconfirm" class="modal-overlay hidden">
+    <div class="modal-box">
+      <h3 style="color:#ef4444;">¡RECONFIRMACIÓN!</h3>
+      <p id="modal-reconfirm-msg">¿Confirmas definitivamente aplicar este cambio?</p>
+      <div class="modal-actions">
+        <button class="btn-primary" style="background:#475569;" onclick="closeModal()">Cancelar</button>
+        <button class="btn-primary" style="background:#dc2626;" onclick="executeAction()">SÍ, CONFIRMAR CAMBIO</button>
+      </div>
+    </div>
+  </div>
 
   <script>
-    const GITHUB_USER = "ivanezlopezpablo"; 
-    const GITHUB_REPO = "losmayorgatv"; 
-    const DURACION_SLIDE_MS = 7000;
-    const REFRESCAR_REPOS_MS = 3 * 60 * 1000;
+    const GITHUB_USER = "ivanezlopezpablo";
+    const GITHUB_REPO = "losmayorgatv";
 
-    const TRANSICIONES = [
-      { in: "animate__fadeInRight", out: "animate__fadeOutLeft" },
-      { in: "animate__zoomIn", out: "animate__zoomOut" },
-      { in: "animate__flipInX", out: "animate__flipOutX" },
-      { in: "animate__slideInUp", out: "animate__slideOutDown" }
-    ];
+    let token = localStorage.getItem("gh_token_mayorga") || "";
+    let productosList = [];
+    let productosSha = "";
+    let pendingAction = null;
 
-    const container = document.getElementById("slider-container");
-    let productos = [];
-    let currentIndex = 0;
-    let stepTimeout = null;
-    let transitionIndex = 0;
+    if (token) {
+      document.getElementById("token-card").classList.add("hidden");
+      document.getElementById("admin-panel").classList.remove("hidden");
+      loadProductsFromGitHub();
+    }
 
-    async function fetchProductsFromGitHub() {
-      const jsonUrl = `https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/main/productos.json?t=${new Date().getTime()}`;
-      
+    function saveToken() {
+      const val = document.getElementById("gh-token").value.trim();
+      if (!val) return alert("Ingresa un Token válido");
+      localStorage.setItem("gh_token_mayorga", val);
+      token = val;
+      location.reload();
+    }
+
+    // Inicializar Drag & Drop
+    const sortableList = document.getElementById('product-list');
+    new Sortable(sortableList, { animation: 150 });
+
+    async function loadProductsFromGitHub() {
       try {
-        const response = await fetch(jsonUrl);
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-
-        const rawData = await response.json();
-        const now = new Date();
-
-        // FILTRADO INTELIGENTE: Solo tomar activos y cuya fecha programada ya haya llegado
-        const filteredData = rawData.filter(p => {
-          const isActivo = p.activo !== false;
-          const isDateValid = !p.fechaProgramada || new Date(p.fechaProgramada) <= now;
-          return isActivo && isDateValid;
+        const res = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/productos.json?t=${Date.now()}`, {
+          headers: { "Authorization": `Bearer ${token}` }
         });
-
-        if (filteredData.length > 0 && JSON.stringify(filteredData) !== JSON.stringify(productos)) {
-          productos = filteredData;
-          updateDOMSlides();
+        if (res.ok) {
+          const data = await res.json();
+          productosSha = data.sha;
+          const decoded = decodeURIComponent(escape(atob(data.content)));
+          productosList = JSON.parse(decoded);
+          renderProductList();
         }
-      } catch (error) {
-        console.warn("Error cargando productos.json:", error);
+      } catch (err) {
+        console.error("Error cargando productos:", err);
       }
     }
 
-    function updateDOMSlides() {
-      clearTimeout(stepTimeout);
-      container.innerHTML = "";
-      
-      productos.forEach((prod, index) => {
-        const slide = document.createElement("div");
-        slide.classList.add("slide", "animate__animated");
-        if (index === 0) slide.classList.add("active");
+    function renderProductList() {
+      sortableList.innerHTML = "";
+      productosList.forEach((p, index) => {
+        const li = document.createElement("li");
+        li.className = "product-item";
+        li.dataset.id = p.id;
 
-        const imgUrl = `https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/main/imagenes/${prod.imagen}`;
+        const imgUrl = `https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/main/imagenes/${p.imagen}`;
 
-        slide.innerHTML = `
-          <img src="${imgUrl}" class="bg-image" alt="${prod.titulo}">
-          
-          <div class="overlay-content">
-            <div class="title-main animate__animated animate__bounceInLeft animate__delay-1s">${prod.titulo}</div>
-            <div class="subtitle animate__animated animate__fadeInLeft animate__delay-1s">${prod.subtitulo || ''}</div>
-            <div class="details-row">
-              <div class="volume animate__animated animate__fadeInUp animate__delay-1s">${prod.volumen || ''}</div>
-              <div class="pack-info animate__animated animate__fadeInUp animate__delay-1s">${prod.presentacion || ''}</div>
+        li.innerHTML = `
+          <div class="product-info">
+            <img src="${imgUrl}" class="product-thumb">
+            <div class="product-details">
+              <h4>${p.titulo} - $${p.precioEntero}</h4>
+              <p>${p.subtitulo || ''} ${p.fechaProgramada ? '| 🕒 Prog: ' + p.fechaProgramada.replace('T', ' ') : ''}</p>
             </div>
           </div>
+          
+          <!-- Switch ON/OFF -->
+          <label class="switch" title="Activar/Desactivar">
+            <input type="checkbox" ${p.activo !== false ? 'checked' : ''} onchange="requestToggleActive(${p.id}, this.checked)">
+            <span class="slider"></span>
+          </label>
 
-          <div class="price-override animate__animated animate__pulse animate__infinite">
-            $ ${prod.precioEntero}<span class="cents">${prod.precioDecimal || '00'}</span>
-          </div>
+          <button class="btn-danger" onclick="requestDelete(${p.id})">Eliminar</button>
         `;
+        sortableList.appendChild(li);
+      });
+    }
 
-        container.appendChild(slide);
+    // GESTIÓN DE MODALES DE CONFIRMACIÓN Y RECONFIRMACIÓN
+    function openModal(title, msg, actionFn) {
+      document.getElementById("modal-title").textContent = title;
+      document.getElementById("modal-msg").textContent = msg;
+      pendingAction = actionFn;
+      document.getElementById("modal-confirm").classList.remove("hidden");
+    }
+
+    function confirmStep1() {
+      document.getElementById("modal-confirm").classList.add("hidden");
+      document.getElementById("modal-reconfirm").classList.remove("hidden");
+    }
+
+    function closeModal() {
+      document.getElementById("modal-confirm").classList.add("hidden");
+      document.getElementById("modal-reconfirm").classList.add("hidden");
+      pendingAction = null;
+      loadProductsFromGitHub();
+    }
+
+    async function executeAction() {
+      document.getElementById("modal-reconfirm").classList.add("hidden");
+      if (pendingAction) await pendingAction();
+    }
+
+    // ACCIONES
+    function requestUpload() {
+      if (!document.getElementById("prod-img").files[0]) return alert("Selecciona una imagen");
+      openModal("¿Publicar Producto?", "La oferta se subirá a GitHub y estará disponible en las pantallas.", processUpload);
+    }
+
+    function requestSaveOrder() {
+      openModal("¿Guardar Nuevo Orden?", "El orden de reproducción cambiará en todas las Smart TV.", processSaveOrder);
+    }
+
+    function requestToggleActive(id, newState) {
+      const stateText = newState ? "ACTIVAR" : "DESACTIVAR";
+      openModal(`¿${stateText} Producto?`, `El producto ${newState ? 'volverá a mostrarse' : 'se ocultará'} en la TV.`, () => {
+        const prod = productosList.find(p => p.id === id);
+        if (prod) prod.activo = newState;
+        return saveJsonToGitHub("Cambiar estado activo/inactivo");
+      });
+    }
+
+    function requestDelete(id) {
+      openModal("¿ELIMINAR PRODUCTO?", "Esta acción es irreversible y quitará el producto del sistema.", () => {
+        productosList = productosList.filter(p => p.id !== id);
+        return saveJsonToGitHub("Eliminar producto");
+      });
+    }
+
+    // GUARDAR EN GITHUB
+    async function processSaveOrder() {
+      const newOrderIds = Array.from(sortableList.children).map(li => parseInt(li.dataset.id));
+      productosList.sort((a, b) => newOrderIds.indexOf(a.id) - newOrderIds.indexOf(b.id));
+      await saveJsonToGitHub("Reordenar lista de productos");
+    }
+
+    const toBase64 = file => new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result.split(',')[1]);
+      reader.onerror = err => reject(err);
+    });
+
+    async function processUpload() {
+      const file = document.getElementById("prod-img").files[0];
+      const base64Content = await toBase64(file);
+      const cleanName = file.name.replace(/[^a-zA-Z0-9.]/g, "_");
+      const imgFileName = `${Date.now()}_${cleanName}`;
+
+      // 1. Subir imagen
+      const imgRes = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/imagenes/${imgFileName}`, {
+        method: "PUT",
+        headers: { "Authorization": `Bearer ${token}`, "Content-Type": "application/json" },
+        body: JSON.stringify({ message: `Subir imagen ${imgFileName}`, content: base64Content })
       });
 
-      currentIndex = 0;
-      playCurrentSlide();
+      if (!imgRes.ok) return alert("Error al subir imagen");
+
+      // 2. Insertar nuevo producto
+      const newProd = {
+        id: Date.now(),
+        activo: true,
+        fechaProgramada: document.getElementById("prod-date").value || null,
+        imagen: imgFileName,
+        titulo: document.getElementById("prod-title").value.toUpperCase(),
+        subtitulo: document.getElementById("prod-sub").value.toUpperCase(),
+        volumen: document.getElementById("prod-vol").value.toUpperCase(),
+        presentacion: document.getElementById("prod-pack").value.toUpperCase(),
+        precioEntero: document.getElementById("prod-price-int").value,
+        precioDecimal: document.getElementById("prod-price-dec").value
+      };
+
+      productosList.push(newProd);
+      await saveJsonToGitHub("Añadir nuevo producto");
+      document.getElementById("product-form").reset();
     }
 
-    function playCurrentSlide() {
-      const slides = document.querySelectorAll(".slide");
-      if (slides.length === 0) return;
+    async function saveJsonToGitHub(commitMsg) {
+      const updatedJsonBase64 = btoa(unescape(encodeURIComponent(JSON.stringify(productosList, null, 2))));
 
-      stepTimeout = setTimeout(() => {
-        nextSlide();
-      }, DURACION_SLIDE_MS);
+      const res = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/productos.json`, {
+        method: "PUT",
+        headers: { "Authorization": `Bearer ${token}`, "Content-Type": "application/json" },
+        body: JSON.stringify({ message: commitMsg, content: updatedJsonBase64, sha: productosSha })
+      });
+
+      if (res.ok) {
+        alert("¡Cambios guardados con éxito en la TV!");
+        loadProductsFromGitHub();
+      } else {
+        alert("Error al actualizar productos.json");
+      }
     }
-
-    function nextSlide() {
-      const slides = document.querySelectorAll(".slide");
-      if (slides.length <= 1) return;
-
-      const currentSlide = slides[currentIndex];
-      const effect = TRANSICIONES[transitionIndex];
-
-      currentSlide.className = `slide active animate__animated ${effect.out}`;
-
-      currentIndex = (currentIndex + 1) % slides.length;
-      transitionIndex = (transitionIndex + 1) % TRANSICIONES.length;
-
-      const nextSlide = slides[currentIndex];
-
-      setTimeout(() => {
-        currentSlide.classList.remove("active", "animate__animated", effect.out);
-        nextSlide.className = `slide active animate__animated ${effect.in}`;
-        playCurrentSlide();
-      }, 800);
-    }
-
-    fetchProductsFromGitHub();
-    setInterval(fetchProductsFromGitHub, REFRESCAR_REPOS_MS);
   </script>
 </body>
 </html>
