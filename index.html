@@ -8,7 +8,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Roboto+Condensed:wght@700;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
 
-  <!-- Firebase v9 (Compatibilidad CDN) -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
@@ -34,7 +33,6 @@
   <div id="slider-container"></div>
 
   <script>
-    // Configuración de Firebase corregida (.appspot.com)
     const firebaseConfig = {
       apiKey: "AIzaSyAhTFpjaWhAUnA3P5_pXGNgjAUlKEtDXAA",
       authDomain: "losmayorgatv.firebaseapp.com",
@@ -62,10 +60,13 @@
     let stepTimeout = null;
     let transitionIndex = 0;
 
-    db.collection("productos").orderBy("orden", "asc").onSnapshot(snapshot => {
+    db.collection("productos").onSnapshot(snapshot => {
       const now = new Date();
       const rawData = [];
       snapshot.forEach(doc => rawData.push({ id: doc.id, ...doc.data() }));
+
+      // Ordenar manualmente en memoria
+      rawData.sort((a, b) => (a.orden ?? 0) - (b.orden ?? 0));
 
       const filtered = rawData.filter(p => {
         const isActivo = p.activo !== false;
