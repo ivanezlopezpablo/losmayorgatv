@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Panel de Administración Avanzado - Los Mayorga TV</title>
 
-  <!-- Librería externa para Arrastrar y Soltar (SortableJS) -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
 
   <style>
@@ -61,7 +60,6 @@
 
   <div class="container">
 
-    <!-- AUTENTICACIÓN DE TOKEN (PRIMERA VEZ) -->
     <div id="token-card" class="card">
       <h2>Acceso Administrador</h2>
       <div class="form-group">
@@ -71,10 +69,8 @@
       <button class="btn-primary" onclick="saveToken()">Ingresar al Control</button>
     </div>
 
-    <!-- PANEL PRINCIPAL -->
     <div id="admin-panel" class="hidden">
 
-      <!-- CARGAR NUEVA OFERTA -->
       <div class="card">
         <h2>Cargar Nueva Oferta</h2>
         <form id="product-form">
@@ -105,249 +101,4 @@
           <div class="row">
             <div class="form-group">
               <label>Precio Entero (ej. 21.076)</label>
-              <input type="text" id="prod-price-int" required placeholder="21.076">
-            </div>
-            <div class="form-group">
-              <label>Precio Decimales</label>
-              <input type="text" id="prod-price-dec" value="90">
-            </div>
-          </div>
-          <div class="form-group">
-            <label>Programar Publicación (Opcional - Dejar vacío para publicar ya)</label>
-            <input type="datetime-local" id="prod-date">
-          </div>
-          <button type="button" class="btn-primary" onclick="requestUpload()">Publicar Oferta</button>
-        </form>
-        <div id="status" class="hidden"></div>
-      </div>
-
-      <!-- LISTA DE PRODUCTOS Y REORDENAR -->
-      <div class="card">
-        <h2>Productos en Pantalla</h2>
-        <p style="font-size: 13px; color: #94a3b8; margin-bottom: 15px;">Arrastra las tarjetas para cambiar el orden de reproducción en las Smart TV.</p>
-        <button class="btn-save-order" onclick="requestSaveOrder()">Guardar Nuevo Orden</button>
-        
-        <ul id="product-list" class="product-list">
-          <!-- Se llena dinámicamente -->
-        </ul>
-      </div>
-
-    </div>
-  </div>
-
-  <!-- MODAL DE CONFIRMACIÓN PASO 1 -->
-  <div id="modal-confirm" class="modal-overlay hidden">
-    <div class="modal-box">
-      <h3 id="modal-title">¿Estás seguro?</h3>
-      <p id="modal-msg">Esta acción actualizará las pantallas de los televisores.</p>
-      <div class="modal-actions">
-        <button class="btn-primary" style="background:#475569;" onclick="closeModal()">Cancelar</button>
-        <button class="btn-primary" onclick="confirmStep1()">Continuar</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- MODAL DE RECONFIRMACIÓN PASO 2 -->
-  <div id="modal-reconfirm" class="modal-overlay hidden">
-    <div class="modal-box">
-      <h3 style="color:#ef4444;">¡RECONFIRMACIÓN!</h3>
-      <p id="modal-reconfirm-msg">¿Confirmas definitivamente aplicar este cambio?</p>
-      <div class="modal-actions">
-        <button class="btn-primary" style="background:#475569;" onclick="closeModal()">Cancelar</button>
-        <button class="btn-primary" style="background:#dc2626;" onclick="executeAction()">SÍ, CONFIRMAR CAMBIO</button>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    const GITHUB_USER = "ivanezlopezpablo";
-    const GITHUB_REPO = "losmayorgatv";
-
-    let token = localStorage.getItem("gh_token_mayorga") || "";
-    let productosList = [];
-    let productosSha = "";
-    let pendingAction = null;
-
-    if (token) {
-      document.getElementById("token-card").classList.add("hidden");
-      document.getElementById("admin-panel").classList.remove("hidden");
-      loadProductsFromGitHub();
-    }
-
-    function saveToken() {
-      const val = document.getElementById("gh-token").value.trim();
-      if (!val) return alert("Ingresa un Token válido");
-      localStorage.setItem("gh_token_mayorga", val);
-      token = val;
-      location.reload();
-    }
-
-    // Inicializar Drag & Drop
-    const sortableList = document.getElementById('product-list');
-    new Sortable(sortableList, { animation: 150 });
-
-    async function loadProductsFromGitHub() {
-      try {
-        const res = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/productos.json?t=${Date.now()}`, {
-          headers: { "Authorization": `Bearer ${token}` }
-        });
-        if (res.ok) {
-          const data = await res.json();
-          productosSha = data.sha;
-          const decoded = decodeURIComponent(escape(atob(data.content)));
-          productosList = JSON.parse(decoded);
-          renderProductList();
-        }
-      } catch (err) {
-        console.error("Error cargando productos:", err);
-      }
-    }
-
-    function renderProductList() {
-      sortableList.innerHTML = "";
-      productosList.forEach((p, index) => {
-        const li = document.createElement("li");
-        li.className = "product-item";
-        li.dataset.id = p.id;
-
-        const imgUrl = `https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/main/imagenes/${p.imagen}`;
-
-        li.innerHTML = `
-          <div class="product-info">
-            <img src="${imgUrl}" class="product-thumb">
-            <div class="product-details">
-              <h4>${p.titulo} - $${p.precioEntero}</h4>
-              <p>${p.subtitulo || ''} ${p.fechaProgramada ? '| 🕒 Prog: ' + p.fechaProgramada.replace('T', ' ') : ''}</p>
-            </div>
-          </div>
-          
-          <!-- Switch ON/OFF -->
-          <label class="switch" title="Activar/Desactivar">
-            <input type="checkbox" ${p.activo !== false ? 'checked' : ''} onchange="requestToggleActive(${p.id}, this.checked)">
-            <span class="slider"></span>
-          </label>
-
-          <button class="btn-danger" onclick="requestDelete(${p.id})">Eliminar</button>
-        `;
-        sortableList.appendChild(li);
-      });
-    }
-
-    // GESTIÓN DE MODALES DE CONFIRMACIÓN Y RECONFIRMACIÓN
-    function openModal(title, msg, actionFn) {
-      document.getElementById("modal-title").textContent = title;
-      document.getElementById("modal-msg").textContent = msg;
-      pendingAction = actionFn;
-      document.getElementById("modal-confirm").classList.remove("hidden");
-    }
-
-    function confirmStep1() {
-      document.getElementById("modal-confirm").classList.add("hidden");
-      document.getElementById("modal-reconfirm").classList.remove("hidden");
-    }
-
-    function closeModal() {
-      document.getElementById("modal-confirm").classList.add("hidden");
-      document.getElementById("modal-reconfirm").classList.add("hidden");
-      pendingAction = null;
-      loadProductsFromGitHub();
-    }
-
-    async function executeAction() {
-      document.getElementById("modal-reconfirm").classList.add("hidden");
-      if (pendingAction) await pendingAction();
-    }
-
-    // ACCIONES
-    function requestUpload() {
-      if (!document.getElementById("prod-img").files[0]) return alert("Selecciona una imagen");
-      openModal("¿Publicar Producto?", "La oferta se subirá a GitHub y estará disponible en las pantallas.", processUpload);
-    }
-
-    function requestSaveOrder() {
-      openModal("¿Guardar Nuevo Orden?", "El orden de reproducción cambiará en todas las Smart TV.", processSaveOrder);
-    }
-
-    function requestToggleActive(id, newState) {
-      const stateText = newState ? "ACTIVAR" : "DESACTIVAR";
-      openModal(`¿${stateText} Producto?`, `El producto ${newState ? 'volverá a mostrarse' : 'se ocultará'} en la TV.`, () => {
-        const prod = productosList.find(p => p.id === id);
-        if (prod) prod.activo = newState;
-        return saveJsonToGitHub("Cambiar estado activo/inactivo");
-      });
-    }
-
-    function requestDelete(id) {
-      openModal("¿ELIMINAR PRODUCTO?", "Esta acción es irreversible y quitará el producto del sistema.", () => {
-        productosList = productosList.filter(p => p.id !== id);
-        return saveJsonToGitHub("Eliminar producto");
-      });
-    }
-
-    // GUARDAR EN GITHUB
-    async function processSaveOrder() {
-      const newOrderIds = Array.from(sortableList.children).map(li => parseInt(li.dataset.id));
-      productosList.sort((a, b) => newOrderIds.indexOf(a.id) - newOrderIds.indexOf(b.id));
-      await saveJsonToGitHub("Reordenar lista de productos");
-    }
-
-    const toBase64 = file => new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => resolve(reader.result.split(',')[1]);
-      reader.onerror = err => reject(err);
-    });
-
-    async function processUpload() {
-      const file = document.getElementById("prod-img").files[0];
-      const base64Content = await toBase64(file);
-      const cleanName = file.name.replace(/[^a-zA-Z0-9.]/g, "_");
-      const imgFileName = `${Date.now()}_${cleanName}`;
-
-      // 1. Subir imagen
-      const imgRes = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/imagenes/${imgFileName}`, {
-        method: "PUT",
-        headers: { "Authorization": `Bearer ${token}`, "Content-Type": "application/json" },
-        body: JSON.stringify({ message: `Subir imagen ${imgFileName}`, content: base64Content })
-      });
-
-      if (!imgRes.ok) return alert("Error al subir imagen");
-
-      // 2. Insertar nuevo producto
-      const newProd = {
-        id: Date.now(),
-        activo: true,
-        fechaProgramada: document.getElementById("prod-date").value || null,
-        imagen: imgFileName,
-        titulo: document.getElementById("prod-title").value.toUpperCase(),
-        subtitulo: document.getElementById("prod-sub").value.toUpperCase(),
-        volumen: document.getElementById("prod-vol").value.toUpperCase(),
-        presentacion: document.getElementById("prod-pack").value.toUpperCase(),
-        precioEntero: document.getElementById("prod-price-int").value,
-        precioDecimal: document.getElementById("prod-price-dec").value
-      };
-
-      productosList.push(newProd);
-      await saveJsonToGitHub("Añadir nuevo producto");
-      document.getElementById("product-form").reset();
-    }
-
-    async function saveJsonToGitHub(commitMsg) {
-      const updatedJsonBase64 = btoa(unescape(encodeURIComponent(JSON.stringify(productosList, null, 2))));
-
-      const res = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/productos.json`, {
-        method: "PUT",
-        headers: { "Authorization": `Bearer ${token}`, "Content-Type": "application/json" },
-        body: JSON.stringify({ message: commitMsg, content: updatedJsonBase64, sha: productosSha })
-      });
-
-      if (res.ok) {
-        alert("¡Cambios guardados con éxito en la TV!");
-        loadProductsFromGitHub();
-      } else {
-        alert("Error al actualizar productos.json");
-      }
-    }
-  </script>
-</body>
-</html>
+              <input type="text" id="
