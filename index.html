@@ -15,13 +15,14 @@
     button { width: 100%; padding: 12px; border: none; border-radius: 6px; background: #0284c7; color: #fff; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px; }
     button:hover { background: #0369a1; }
     .hidden { display: none; }
-    #status { margin-top: 15px; padding: 10px; border-radius: 6px; font-size: 14px; text-align: center; }
+    #status { margin-top: 15px; padding: 10px; border-radius: 6px; font-size: 14px; text-align: center; word-break: break-word; }
     .success { background: #15803d; color: #fff; }
     .error { background: #b91c1c; color: #fff; }
   </style>
 </head>
 <body>
 
+  <!-- CONFIGURACIÓN DE TOKEN -->
   <div id="token-card" class="card">
     <h2>Acceso Administrador</h2>
     <div class="form-group">
@@ -31,6 +32,7 @@
     <button onclick="saveToken()">Ingresar al Panel</button>
   </div>
 
+  <!-- FORMULARIO DE CARGA DE PRODUCTOS -->
   <div id="admin-card" class="card hidden">
     <h2>Cargar Producto a Vidriera</h2>
     <form id="product-form">
@@ -100,7 +102,6 @@
       statusDiv.classList.remove("hidden");
     }
 
-    // Convertir archivo a Base64
     const toBase64 = file => new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.readAsDataURL(file);
@@ -117,28 +118,33 @@
       try {
         const file = fileInput.files[0];
         const base64Content = await toBase64(file);
-        const fileName = `${Date.now()}_${file.name.replace(/\s+/g, '_')}`;
+        // Limpiar el nombre de archivo para evitar caracteres inválidos
+        const cleanName = file.name.replace(/[^a-zA-Z0-9.]/g, "_");
+        const fileName = `${Date.now()}_${cleanName}`;
 
-        // 1. Subir la imagen a la carpeta /imagenes en GitHub mediante API
+        // 1. Subir la imagen
         const imgApiUrl = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/imagenes/${fileName}`;
         const imgResponse = await fetch(imgApiUrl, {
           method: "PUT",
           headers: {
-            "Authorization": `token ${token}`,
+            "Authorization": `Bearer ${token}`,
             "Content-Type": "application/json"
           },
           body: JSON.stringify({
-            message: `Añadir imagen ${fileName}`,
+            message: `Subir imagen ${fileName}`,
             content: base64Content
           })
         });
 
-        if (!imgResponse.ok) throw new Error("Error al subir la imagen a GitHub");
+        if (!imgResponse.ok) {
+          const errorData = await imgResponse.json();
+          throw new Error(`Subida de imagen falló (${imgResponse.status}): ${errorData.message}`);
+        }
 
-        // 2. Obtener el archivo productos.json actual
+        // 2. Obtener productos.json actual
         const jsonApiUrl = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/productos.json`;
         const jsonGetResp = await fetch(jsonApiUrl, {
-          headers: { "Authorization": `token ${token}` }
+          headers: { "Authorization": `Bearer ${token}` }
         });
 
         let currentProducts = [];
@@ -151,7 +157,7 @@
           currentProducts = JSON.parse(decodedContent);
         }
 
-        // 3. Crear el nuevo objeto de producto y agregarlo a la lista
+        // 3. Agregar nuevo producto
         const newProduct = {
           imagen: fileName,
           titulo: document.getElementById("prod-title").value.toUpperCase(),
@@ -164,13 +170,13 @@
 
         currentProducts.push(newProduct);
 
-        // 4. Guardar el productos.json actualizado en GitHub
+        // 4. Guardar JSON actualizado
         const updatedJsonBase64 = btoa(unescape(encodeURIComponent(JSON.stringify(currentProducts, null, 2))));
         
         const jsonPutResp = await fetch(jsonApiUrl, {
           method: "PUT",
           headers: {
-            "Authorization": `token ${token}`,
+            "Authorization": `Bearer ${token}`,
             "Content-Type": "application/json"
           },
           body: JSON.stringify({
@@ -180,9 +186,12 @@
           })
         });
 
-        if (!jsonPutResp.ok) throw new Error("Error al actualizar productos.json");
+        if (!jsonPutResp.ok) {
+          const errorData = await jsonPutResp.json();
+          throw new Error(`Actualización JSON falló (${jsonPutResp.status}): ${errorData.message}`);
+        }
 
-        showStatus("¡Producto cargado exitosamente! Las TV se actualizarán en breve.");
+        showStatus("¡Producto cargado exitosamente! La TV se actualizará en unos minutos.");
         document.getElementById("product-form").reset();
 
       } catch (err) {
