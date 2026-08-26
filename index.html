@@ -2,279 +2,122 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Vidriera Digital Profesional - Los Mayorga TV</title>
-  
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Roboto+Condensed:wght@700;900&display=swap" rel="stylesheet">
-  
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
-
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panel de Carga - Los Mayorga TV</title>
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    html, body {
-      width: 100vw;
-      height: 100vh;
-      background-color: #000000;
-      overflow: hidden;
-      cursor: none;
-      font-family: 'Oswald', sans-serif;
-    }
-
-    #slider-container {
-      position: relative;
-      width: 100vw;
-      height: 100vh;
-    }
-
-    .slide {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      display: none;
-    }
-
-    .slide.active {
-      display: block;
-      z-index: 10;
-    }
-
-    /* Imagen de fondo */
-    .bg-image {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      z-index: 1;
-    }
-
-    /* Capa de contenido e información sobre la imagen */
-    .overlay-content {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 50%;
-      height: 100%;
-      z-index: 2;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      padding-left: 4vw;
-      color: #ffffff;
-      text-transform: uppercase;
-    }
-
-    .title-main {
-      font-size: 8.5vw;
-      font-weight: 700;
-      color: #38bdf8;
-      line-height: 0.85;
-      letter-spacing: -1px;
-      text-shadow: 3px 3px 15px rgba(0,0,0,0.8);
-    }
-
-    .subtitle {
-      font-size: 2.2vw;
-      color: #ffffff;
-      letter-spacing: 1px;
-      margin-top: 5px;
-      margin-bottom: 10px;
-      text-shadow: 2px 2px 8px rgba(0,0,0,0.8);
-    }
-
-    .details-row {
-      display: flex;
-      align-items: baseline;
-      gap: 1.5vw;
-    }
-
-    .volume {
-      font-size: 8vw;
-      font-weight: 700;
-      color: #fef08a;
-      line-height: 0.8;
-      text-shadow: 3px 3px 12px rgba(0,0,0,0.8);
-    }
-
-    .pack-info {
-      font-size: 3vw;
-      font-weight: 700;
-      color: #ffffff;
-      line-height: 0.95;
-      max-width: 12vw;
-      text-shadow: 2px 2px 8px rgba(0,0,0,0.8);
-    }
-
-    /* Etiqueta flotante de Precio con Animación de Pulso continuo */
-    .price-override {
-      position: absolute;
-      bottom: 4vh;
-      right: 4vw;
-      z-index: 3;
-      background-color: #ffffff;
-      padding: 0.5vw 2vw;
-      font-family: 'Roboto Condensed', sans-serif;
-      color: #000000;
-      font-size: 5.5vw;
-      font-weight: 900;
-      display: flex;
-      align-items: flex-start;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-      border-radius: 4px;
-    }
-
-    .price-override .cents {
-      font-size: 2.8vw;
-      text-decoration: underline;
-      margin-left: 3px;
-    }
-
-    #status-badge {
-      position: absolute;
-      top: 20px;
-      right: 20px;
-      background: rgba(220, 38, 38, 0.9);
-      color: #ffffff;
-      padding: 8px 16px;
-      border-radius: 20px;
-      font-size: 14px;
-      z-index: 999;
-    }
-
-    .hidden { opacity: 0; pointer-events: none; }
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; }
+    body { background: #0f172a; color: #fff; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+    .card { background: #1e293b; padding: 30px; border-radius: 12px; width: 100%; max-width: 480px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+    h2 { margin-bottom: 20px; text-align: center; color: #38bdf8; }
+    .form-group { margin-bottom: 15px; }
+    label { display: block; margin-bottom: 5px; font-size: 14px; color: #94a3b8; }
+    input { width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #334155; background: #0f172a; color: #fff; font-size: 15px; }
+    button { width: 100%; padding: 12px; border: none; border-radius: 6px; background: #0284c7; color: #fff; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+    button:hover { background: #0369a1; }
+    .hidden { display: none; }
+    #status { margin-top: 15px; padding: 10px; border-radius: 6px; font-size: 14px; text-align: center; }
+    .success { background: #15803d; color: #fff; }
+    .error { background: #b91c1c; color: #fff; }
   </style>
 </head>
 <body>
 
-  <div id="slider-container"></div>
-  <div id="status-badge" class="hidden">Modo Offline</div>
+  <div id="token-card" class="card">
+    <h2>Acceso Administrador</h2>
+    <div class="form-group">
+      <label>GitHub Personal Access Token</label>
+      <input type="password" id="gh-token" placeholder="ghp_xxxxxxxxxxxx">
+    </div>
+    <button onclick="saveToken()">Ingresar al Panel</button>
+  </div>
+
+  <div id="admin-card" class="card hidden">
+    <h2>Cargar Producto a Vidriera</h2>
+    <form id="product-form">
+      <div class="form-group">
+        <label>Imagen Limpia del Producto</label>
+        <input type="file" id="prod-img" accept="image/*" required>
+      </div>
+      <div class="form-group">
+        <label>Título (ej. CERVEZA)</label>
+        <input type="text" id="prod-title" required placeholder="CERVEZA">
+      </div>
+      <div class="form-group">
+        <label>Subtítulo (ej. CLÁSICA EN LATA)</label>
+        <input type="text" id="prod-sub" placeholder="CLÁSICA EN LATA">
+      </div>
+      <div class="form-group">
+        <label>Volumen / Medida (ej. 473CC)</label>
+        <input type="text" id="prod-vol" placeholder="473CC">
+      </div>
+      <div class="form-group">
+        <label>Presentación (ej. PACK POR 6 UNIDADES)</label>
+        <input type="text" id="prod-pack" placeholder="PACK POR 6 UNIDADES">
+      </div>
+      <div class="form-group">
+        <label>Precio Entero (ej. 21.076)</label>
+        <input type="text" id="prod-price-int" required placeholder="21.076">
+      </div>
+      <div class="form-group">
+        <label>Precio Decimales (ej. 90)</label>
+        <input type="text" id="prod-price-dec" value="00">
+      </div>
+      <button type="button" onclick="uploadToGitHub()">Publicar en TV</button>
+      <button type="button" onclick="logout()" style="background:#475569;">Cerrar Sesión</button>
+    </form>
+    <div id="status" class="hidden"></div>
+  </div>
 
   <script>
-    const GITHUB_USER = "ivanezlopezpablo"; 
-    const GITHUB_REPO = "losmayorgatv"; 
-    const DURACION_SLIDE_MS = 7000;
-    const REFRESCAR_REPOS_MS = 5 * 60 * 1000;
+    const GITHUB_USER = "ivanezlopezpablo";
+    const GITHUB_REPO = "losmayorgatv";
 
-    // Repertorio de transiciones profesionales que irán rotando
-    const TRANSICIONES = [
-      { in: "animate__fadeInRight", out: "animate__fadeOutLeft" },
-      { in: "animate__zoomIn", out: "animate__zoomOut" },
-      { in: "animate__flipInX", out: "animate__flipOutX" },
-      { in: "animate__backInDown", out: "animate__backOutUp" },
-      { in: "animate__slideInUp", out: "animate__slideOutDown" }
-    ];
+    let token = localStorage.getItem("gh_token") || "";
 
-    const container = document.getElementById("slider-container");
-    const statusBadge = document.getElementById("status-badge");
+    if (token) {
+      document.getElementById("token-card").classList.add("hidden");
+      document.getElementById("admin-card").classList.remove("hidden");
+    }
 
-    let productos = [];
-    let currentIndex = 0;
-    let stepTimeout = null;
-    let transitionIndex = 0;
+    function saveToken() {
+      const inputToken = document.getElementById("gh-token").value.trim();
+      if (!inputToken) return alert("Ingresa un Token válido");
+      localStorage.setItem("gh_token", inputToken);
+      token = inputToken;
+      document.getElementById("token-card").classList.add("hidden");
+      document.getElementById("admin-card").classList.remove("hidden");
+    }
 
-    async function fetchProductsFromGitHub() {
-      const jsonUrl = `https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/main/productos.json?t=${new Date().getTime()}`;
-      
+    function logout() {
+      localStorage.removeItem("gh_token");
+      location.reload();
+    }
+
+    function showStatus(msg, isError = false) {
+      const statusDiv = document.getElementById("status");
+      statusDiv.textContent = msg;
+      statusDiv.className = isError ? "error" : "success";
+      statusDiv.classList.remove("hidden");
+    }
+
+    // Convertir archivo a Base64
+    const toBase64 = file => new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result.split(',')[1]);
+      reader.onerror = error => reject(error);
+    });
+
+    async function uploadToGitHub() {
+      const fileInput = document.getElementById("prod-img");
+      if (!fileInput.files[0]) return alert("Selecciona una imagen");
+
+      showStatus("Subiendo imagen y actualizando datos a GitHub...");
+
       try {
-        const response = await fetch(jsonUrl);
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const file = fileInput.files[0];
+        const base64Content = await toBase64(file);
+        const fileName = `${Date.now()}_${file.name.replace(/\s+/g, '_')}`;
 
-        const data = await response.json();
-        statusBadge.classList.add("hidden");
-
-        if (data.length > 0 && JSON.stringify(data) !== JSON.stringify(productos)) {
-          productos = data;
-          updateDOMSlides();
-        }
-      } catch (error) {
-        console.warn("Error cargando productos.json:", error);
-        statusBadge.classList.remove("hidden");
-      }
-    }
-
-    function updateDOMSlides() {
-      clearTimeout(stepTimeout);
-      container.innerHTML = "";
-      
-      productos.forEach((prod, index) => {
-        const slide = document.createElement("div");
-        slide.classList.add("slide", "animate__animated");
-        if (index === 0) slide.classList.add("active");
-
-        const imgUrl = `https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/main/imagenes/${prod.imagen}`;
-
-        slide.innerHTML = `
-          <img src="${imgUrl}" class="bg-image" alt="${prod.titulo}">
-          
-          <div class="overlay-content">
-            <div class="title-main animate__animated animate__bounceInLeft animate__delay-1s">${prod.titulo}</div>
-            <div class="subtitle animate__animated animate__fadeInLeft animate__delay-1s">${prod.subtitulo}</div>
-            <div class="details-row">
-              <div class="volume animate__animated animate__keyframe animate__fadeInUp animate__delay-1s">${prod.volumen}</div>
-              <div class="pack-info animate__animated animate__fadeInUp animate__delay-1s">${prod.presentacion}</div>
-            </div>
-          </div>
-
-          ${prod.precioEntero ? `
-            <div class="price-override animate__animated animate__pulse animate__infinite">
-              $ ${prod.precioEntero}<span class="cents">${prod.precioDecimal || '00'}</span>
-            </div>
-          ` : ''}
-        `;
-
-        container.appendChild(slide);
-      });
-
-      currentIndex = 0;
-      playCurrentSlide();
-    }
-
-    function playCurrentSlide() {
-      const slides = document.querySelectorAll(".slide");
-      if (slides.length === 0) return;
-
-      stepTimeout = setTimeout(() => {
-        nextSlide();
-      }, DURACION_SLIDE_MS);
-    }
-
-    function nextSlide() {
-      const slides = document.querySelectorAll(".slide");
-      if (slides.length <= 1) return;
-
-      const currentSlide = slides[currentIndex];
-      const effect = TRANSICIONES[transitionIndex];
-
-      // Aplicar animación de salida a la diapositiva actual
-      currentSlide.className = `slide active animate__animated ${effect.out}`;
-
-      // Avanzar el índice
-      currentIndex = (currentIndex + 1) % slides.length;
-      transitionIndex = (transitionIndex + 1) % TRANSICIONES.length;
-
-      const nextSlide = slides[currentIndex];
-
-      setTimeout(() => {
-        currentSlide.classList.remove("active", "animate__animated", effect.out);
-        
-        // Entrada con la siguiente transición
-        nextSlide.className = `slide active animate__animated ${effect.in}`;
-        playCurrentSlide();
-      }, 800); // Duración de la salida
-    }
-
-    fetchProductsFromGitHub();
-    setInterval(fetchProductsFromGitHub, REFRESCAR_REPOS_MS);
-  </script>
-</body>
-</html>
+        // 1. Subir la imagen a la carpeta /imagenes en GitHub mediante API
+        const imgApiUrl = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB
