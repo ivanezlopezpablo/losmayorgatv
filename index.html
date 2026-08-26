@@ -3,11 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Vidriera Digital - Plantilla Dinámica</title>
-  <!-- Tipografía similar a la gráfica original -->
+  <title>Vidriera Digital Profesional - Los Mayorga TV</title>
+  
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Roboto+Condensed:wght@700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Roboto+Condensed:wght@700;900&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
 
   <style>
     * {
@@ -37,16 +39,15 @@
       left: 0;
       width: 100%;
       height: 100%;
-      opacity: 0;
-      transition: opacity 1s ease-in-out;
+      display: none;
     }
 
     .slide.active {
-      opacity: 1;
+      display: block;
       z-index: 10;
     }
 
-    /* Imagen limpia de fondo */
+    /* Imagen de fondo */
     .bg-image {
       position: absolute;
       top: 0;
@@ -57,12 +58,12 @@
       z-index: 1;
     }
 
-    /* Contenedor de Textos Superpuestos (Lado Izquierdo) */
+    /* Capa de contenido e información sobre la imagen */
     .overlay-content {
       position: absolute;
       top: 0;
       left: 0;
-      width: 50%; /* Ocupa la mitad izquierda sobre la copa */
+      width: 50%;
       height: 100%;
       z-index: 2;
       display: flex;
@@ -73,25 +74,24 @@
       text-transform: uppercase;
     }
 
-    /* Estilos del Título Principal "CERVEZA" */
     .title-main {
       font-size: 8.5vw;
       font-weight: 700;
-      color: #38bdf8; /* Azul claro idéntico al diseño */
+      color: #38bdf8;
       line-height: 0.85;
       letter-spacing: -1px;
+      text-shadow: 3px 3px 15px rgba(0,0,0,0.8);
     }
 
-    /* Subtítulo "CLÁSICA EN LATA" */
     .subtitle {
       font-size: 2.2vw;
       color: #ffffff;
       letter-spacing: 1px;
       margin-top: 5px;
       margin-bottom: 10px;
+      text-shadow: 2px 2px 8px rgba(0,0,0,0.8);
     }
 
-    /* Fila de detalles: 473CC + PACK POR 6 UNIDADES */
     .details-row {
       display: flex;
       align-items: baseline;
@@ -101,8 +101,9 @@
     .volume {
       font-size: 8vw;
       font-weight: 700;
-      color: #fef08a; /* Tono beige/amarillo claro */
+      color: #fef08a;
       line-height: 0.8;
+      text-shadow: 3px 3px 12px rgba(0,0,0,0.8);
     }
 
     .pack-info {
@@ -111,29 +112,31 @@
       color: #ffffff;
       line-height: 0.95;
       max-width: 12vw;
+      text-shadow: 2px 2px 8px rgba(0,0,0,0.8);
     }
 
-    /* Sobrescribir precio dinámicamente si la imagen no lo incluye en el diseño */
+    /* Etiqueta flotante de Precio con Animación de Pulso continuo */
     .price-override {
       position: absolute;
       bottom: 4vh;
       right: 4vw;
-      z-index: 2;
+      z-index: 3;
       background-color: #ffffff;
       padding: 0.5vw 2vw;
       font-family: 'Roboto Condensed', sans-serif;
       color: #000000;
-      font-size: 5vw;
-      font-weight: 700;
+      font-size: 5.5vw;
+      font-weight: 900;
       display: flex;
       align-items: flex-start;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+      border-radius: 4px;
     }
 
     .price-override .cents {
-      font-size: 2.5vw;
+      font-size: 2.8vw;
       text-decoration: underline;
-      margin-left: 2px;
+      margin-left: 3px;
     }
 
     #status-badge {
@@ -158,9 +161,18 @@
 
   <script>
     const GITHUB_USER = "ivanezlopezpablo"; 
-    const GITHUB_REPO = "portankotv1"; 
+    const GITHUB_REPO = "losmayorgatv"; 
     const DURACION_SLIDE_MS = 7000;
     const REFRESCAR_REPOS_MS = 5 * 60 * 1000;
+
+    // Repertorio de transiciones profesionales que irán rotando
+    const TRANSICIONES = [
+      { in: "animate__fadeInRight", out: "animate__fadeOutLeft" },
+      { in: "animate__zoomIn", out: "animate__zoomOut" },
+      { in: "animate__flipInX", out: "animate__flipOutX" },
+      { in: "animate__backInDown", out: "animate__backOutUp" },
+      { in: "animate__slideInUp", out: "animate__slideOutDown" }
+    ];
 
     const container = document.getElementById("slider-container");
     const statusBadge = document.getElementById("status-badge");
@@ -168,6 +180,7 @@
     let productos = [];
     let currentIndex = 0;
     let stepTimeout = null;
+    let transitionIndex = 0;
 
     async function fetchProductsFromGitHub() {
       const jsonUrl = `https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/main/productos.json?t=${new Date().getTime()}`;
@@ -195,7 +208,7 @@
       
       productos.forEach((prod, index) => {
         const slide = document.createElement("div");
-        slide.classList.add("slide");
+        slide.classList.add("slide", "animate__animated");
         if (index === 0) slide.classList.add("active");
 
         const imgUrl = `https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/main/imagenes/${prod.imagen}`;
@@ -204,16 +217,16 @@
           <img src="${imgUrl}" class="bg-image" alt="${prod.titulo}">
           
           <div class="overlay-content">
-            <div class="title-main">${prod.titulo}</div>
-            <div class="subtitle">${prod.subtitulo}</div>
+            <div class="title-main animate__animated animate__bounceInLeft animate__delay-1s">${prod.titulo}</div>
+            <div class="subtitle animate__animated animate__fadeInLeft animate__delay-1s">${prod.subtitulo}</div>
             <div class="details-row">
-              <div class="volume">${prod.volumen}</div>
-              <div class="pack-info">${prod.presentacion}</div>
+              <div class="volume animate__animated animate__keyframe animate__fadeInUp animate__delay-1s">${prod.volumen}</div>
+              <div class="pack-info animate__animated animate__fadeInUp animate__delay-1s">${prod.presentacion}</div>
             </div>
           </div>
 
           ${prod.precioEntero ? `
-            <div class="price-override">
+            <div class="price-override animate__animated animate__pulse animate__infinite">
               $ ${prod.precioEntero}<span class="cents">${prod.precioDecimal || '00'}</span>
             </div>
           ` : ''}
@@ -239,11 +252,25 @@
       const slides = document.querySelectorAll(".slide");
       if (slides.length <= 1) return;
 
-      slides[currentIndex].classList.remove("active");
+      const currentSlide = slides[currentIndex];
+      const effect = TRANSICIONES[transitionIndex];
+
+      // Aplicar animación de salida a la diapositiva actual
+      currentSlide.className = `slide active animate__animated ${effect.out}`;
+
+      // Avanzar el índice
       currentIndex = (currentIndex + 1) % slides.length;
-      slides[currentIndex].classList.add("active");
-      
-      playCurrentSlide();
+      transitionIndex = (transitionIndex + 1) % TRANSICIONES.length;
+
+      const nextSlide = slides[currentIndex];
+
+      setTimeout(() => {
+        currentSlide.classList.remove("active", "animate__animated", effect.out);
+        
+        // Entrada con la siguiente transición
+        nextSlide.className = `slide active animate__animated ${effect.in}`;
+        playCurrentSlide();
+      }, 800); // Duración de la salida
     }
 
     fetchProductsFromGitHub();
