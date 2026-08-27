@@ -31,7 +31,6 @@
     .row { display: flex; gap: 15px; }
     .row .form-group { flex: 1; }
 
-    /* ESTILO INTERRUPTOR OFERTA (ROJO DESACTIVADO / VERDE ACTIVADO) */
     .oferta-toggle-box {
       display: flex;
       align-items: center;
@@ -112,10 +111,10 @@
       padding: 20px;
     }
 
-    /* BADGE OFERTA 3D CON FUEGUITO ANIMADO (MARGEN SUPERIOR IZQUIERDO) */
+    /* BADGE OFERTA 3D REUBICADO UN POCO MÁS ABAJO */
     .badge-oferta-3d {
       position: absolute;
-      top: 6%;
+      top: 14%; /* Ajustado más abajo */
       left: 10%;
       z-index: 10;
       background: linear-gradient(180deg, #ffe600 0%, #ff8800 50%, #d90000 100%);
@@ -127,7 +126,7 @@
       text-transform: uppercase;
       letter-spacing: 1px;
       border: 2px solid #fff;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.7), inset 0 2px 2px rgba(255,255,255,0.6);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.8), inset 0 2px 2px rgba(255,255,255,0.6);
       text-shadow: 2px 2px 0px #700000;
       display: flex;
       align-items: center;
@@ -159,21 +158,39 @@
       text-transform: uppercase;
     }
 
+    /* TÍTULO Y VOLUMEN CON PALETA ADAPTATIVA Y BORDE NEGRO DE ALTO CONTRASTE */
     .preview-title {
       font-size: 2.2rem;
       font-weight: 700;
       color: #38bdf8;
       line-height: 0.85;
-      text-shadow: 2px 2px 8px rgba(0,0,0,0.9);
       word-break: break-word;
       transition: color 0.3s ease;
+      text-shadow: 
+        2px 2px 0 #000, -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000,
+        0 3px 12px rgba(0,0,0,0.9);
     }
 
+    .preview-vol {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #fef08a;
+      line-height: 0.8;
+      transition: color 0.3s ease;
+      text-shadow: 
+        2px 2px 0 #000, -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000,
+        0 3px 12px rgba(0,0,0,0.9);
+    }
+
+    /* TEXTOS DE DESCRIPCIÓN: BLANCO PURO CON BORDES Y SOMBRA DIFUMINADA NEGRA */
     .preview-subtitle {
-      font-size: 0.75rem;
-      color: #fff;
-      margin-top: 4px;
-      text-shadow: 2px 2px 6px rgba(0,0,0,0.9);
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: #ffffff;
+      margin-top: 6px;
+      text-shadow: 
+        1.5px 1.5px 0 #000, -1.5px -1.5px 0 #000, 1.5px -1.5px 0 #000, -1.5px 1.5px 0 #000,
+        0 0 8px rgba(0,0,0,0.95);
     }
 
     .preview-details {
@@ -183,22 +200,15 @@
       margin-top: 6px;
     }
 
-    .preview-vol {
-      font-size: 2rem;
-      font-weight: 700;
-      color: #fef08a;
-      line-height: 0.8;
-      text-shadow: 2px 2px 8px rgba(0,0,0,0.9);
-      transition: color 0.3s ease;
-    }
-
     .preview-pack {
       font-size: 0.8rem;
       font-weight: 700;
-      color: #fff;
+      color: #ffffff;
       line-height: 0.95;
-      max-width: 40%;
-      text-shadow: 2px 2px 6px rgba(0,0,0,0.9);
+      max-width: 45%;
+      text-shadow: 
+        1.5px 1.5px 0 #000, -1.5px -1.5px 0 #000, 1.5px -1.5px 0 #000, -1.5px 1.5px 0 #000,
+        0 0 8px rgba(0,0,0,0.95);
     }
 
     .preview-price {
@@ -257,7 +267,7 @@
   <div class="container">
     
     <div class="admin-grid">
-      <!-- FORMULARIO DE CARGA -->
+      <!-- FORMULARIO -->
       <div class="card">
         <div class="header-bar">
           <h2 id="form-header-title">Cargar Nueva Oferta</h2>
@@ -323,7 +333,7 @@
         <div id="status" class="hidden"></div>
       </div>
 
-      <!-- PREVISUALIZACIÓN VISTA PREVIA SMART TV -->
+      <!-- PREVISUALIZACIÓN -->
       <div class="card">
         <h2>Vista Previa en Vivo (Smart TV)</h2>
         <p style="font-size: 13px; color: #94a3b8; margin-bottom: 15px;">Así es como se proyectará esta oferta exactamente en los televisores del local.</p>
