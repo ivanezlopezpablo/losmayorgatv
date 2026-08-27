@@ -6,6 +6,7 @@
   <title>Vidriera Digital - Los Mayorga TV</title>
 
   <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700;900&family=Roboto+Condensed:wght@700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
 
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
@@ -31,7 +32,7 @@
 
     .bg-image { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; }
     
-    /* BADGES EN SMART TV REUBICADOS EN top: 18vh */
+    /* BADGES CON POSICIÓN Y ANIMACIÓN ANIMATE.CSS */
     .badge-oferta-3d {
       position: absolute;
       top: 18vh; left: 10vw; z-index: 10;
@@ -71,8 +72,9 @@
     .volume { font-size: 8vw; font-weight: 700; line-height: 0.8; text-shadow: 0 0.5vw 2vw rgba(0,0,0,0.95); }
     .pack-info { font-size: 3vw; font-weight: 700; color: #ffffff; line-height: 0.95; max-width: 15vw; text-shadow: 0 0.4vw 1.5vw rgba(0,0,0,0.95); }
     
+    /* PRECIO REUBICADO UN POCO MÁS A LA IZQUIERDA Y ABAJO CON ANIMACIÓN PALPITANTE */
     .price-override { 
-      position: absolute; bottom: 18vh; right: 4vw; z-index: 3; background-color: #fff; 
+      position: absolute; bottom: 12vh; right: 8vw; z-index: 3; background-color: #fff; 
       padding: 0.5vw 2vw; font-family: 'Roboto Condensed', sans-serif; color: #000; 
       font-size: 5.5vw; font-weight: 900; display: flex; align-items: flex-start; 
       box-shadow: 0 10px 25px rgba(0,0,0,0.5); border-radius: 4px; 
@@ -143,7 +145,7 @@
         let legalBannerHTML = "";
 
         if (prod.showOfertaBadge === true) {
-          badgeHTML = `<div class="badge-oferta-3d"><span>¡OFERTA!</span><span class="fire-icon">🔥</span></div>`;
+          badgeHTML = `<div class="badge-oferta-3d animate__animated animate__zoomIn animate__delay-1s"><span>¡OFERTA!</span><span class="fire-icon">🔥</span></div>`;
           let sloganText = "OFERTA VÁLIDA HASTA AGOTAR STOCK";
           if (prod.fechaFinOferta) {
             const parts = prod.fechaFinOferta.split("-");
@@ -151,9 +153,9 @@
               sloganText = `OFERTA VÁLIDA HASTA AGOTAR STOCK O HASTA EL ${parts[2]}/${parts[1]}/${parts[0]} - LO QUE OCURRA ANTES`;
             }
           }
-          legalBannerHTML = `<div class="preview-legal-banner">${sloganText}</div>`;
+          legalBannerHTML = `<div class="preview-legal-banner animate__animated animate__fadeInUp animate__delay-1s">${sloganText}</div>`;
         } else if (prod.showNuevoBadge === true) {
-          badgeHTML = `<div class="badge-nuevo-3d"><span>¡NUEVO INGRESO!</span><span>✨</span></div>`;
+          badgeHTML = `<div class="badge-nuevo-3d animate__animated animate__zoomIn animate__delay-1s"><span>¡NUEVO INGRESO!</span><span>✨</span></div>`;
         }
 
         slide.innerHTML = `
@@ -161,14 +163,14 @@
           ${legalBannerHTML}
           ${bgMedia}
           <div class="overlay-content">
-            <div class="title-main" style="color: ${colorTitle}">${prod.titulo}</div>
-            <div class="subtitle">${prod.subtitulo || ''}</div>
+            <div class="title-main animate__animated animate__bounceInLeft animate__delay-1s" style="color: ${colorTitle}">${prod.titulo}</div>
+            <div class="subtitle animate__animated animate__fadeInLeft animate__delay-1s">${prod.subtitulo || ''}</div>
             <div class="details-row">
-              <div class="volume" style="color: ${colorVol}">${prod.volumen || ''}</div>
-              <div class="pack-info">${prod.presentacion || ''}</div>
+              <div class="volume animate__animated animate__fadeInUp animate__delay-1s" style="color: ${colorVol}">${prod.volumen || ''}</div>
+              <div class="pack-info animate__animated animate__fadeInUp animate__delay-1s">${prod.presentacion || ''}</div>
             </div>
           </div>
-          <div class="price-override">
+          <div class="price-override animate__animated animate__pulse animate__infinite">
             $ ${prod.precioEntero}<span class="cents">${prod.precioDecimal || '00'}</span>
           </div>
         `;
