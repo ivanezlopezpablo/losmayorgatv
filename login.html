@@ -7,13 +7,13 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Roboto', sans-serif; }
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
     
     body {
-      background-color: #030712;
+      background: radial-gradient(circle at 50% 30%, #1e293b 0%, #0f172a 60%, #020617 100%);
       color: #f8fafc;
       height: 100vh;
       width: 100vw;
@@ -24,28 +24,29 @@
       position: relative;
     }
 
-    /* CANVAS DE FONDO DINÁMICO FUTURISTA */
-    #futuristic-bg {
+    /* MALLA CIBERNÉTICA DE FONDO */
+    .bg-grid {
       position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background-image: linear-gradient(to right, rgba(56, 189, 248, 0.05) 1px, transparent 1px),
+                        linear-gradient(to bottom, rgba(56, 189, 248, 0.05) 1px, transparent 1px);
+      background-size: 40px 40px;
       z-index: 1;
     }
 
-    /* TARJETA PRINCIPAL DEL LOGIN */
+    /* TARJETA DE LOGIN */
     .login-card {
       position: relative;
       z-index: 10;
       width: 100%;
       max-width: 420px;
       padding: 35px 30px;
-      background: rgba(15, 23, 42, 0.85);
+      background: rgba(15, 23, 42, 0.92);
       backdrop-filter: blur(12px);
-      border: 1px solid rgba(56, 189, 248, 0.3);
+      border: 1px solid rgba(56, 189, 248, 0.25);
       border-radius: 16px;
-      box-shadow: 0 0 35px rgba(2, 132, 199, 0.25), inset 0 0 15px rgba(56, 189, 248, 0.1);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
     }
 
     .login-header {
@@ -53,32 +54,38 @@
       margin-bottom: 25px;
     }
 
+    .brand-icon {
+      width: 48px;
+      height: 48px;
+      fill: #38bdf8;
+      margin-bottom: 10px;
+    }
+
     .login-header h1 {
-      font-family: 'Oswald', sans-serif;
-      font-size: 26px;
-      letter-spacing: 1px;
-      color: #38bdf8;
-      text-transform: uppercase;
-      text-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
+      font-size: 22px;
+      font-weight: 800;
+      color: #f8fafc;
+      letter-spacing: -0.5px;
     }
 
     .login-header p {
       font-size: 13px;
       color: #94a3b8;
-      margin-top: 5px;
+      margin-top: 4px;
     }
 
     .form-group {
-      margin-bottom: 20px;
-      position: relative;
+      margin-bottom: 16px;
     }
 
     label {
       display: block;
-      font-size: 13px;
+      font-size: 12px;
       color: #cbd5e1;
       margin-bottom: 6px;
-      font-weight: bold;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
 
     .input-wrapper {
@@ -87,128 +94,83 @@
       align-items: center;
     }
 
-    .input-icon {
+    .field-icon {
       position: absolute;
       left: 12px;
-      font-size: 16px;
-      color: #0284c7;
+      width: 18px;
+      height: 18px;
+      fill: #0284c7;
+      z-index: 2;
     }
 
     input[type="text"], input[type="password"] {
       width: 100%;
-      padding: 12px 40px 12px 38px;
-      background: rgba(15, 23, 42, 0.9);
+      padding: 12px 40px 12px 40px;
+      background: #0f172a;
       border: 1px solid #334155;
       border-radius: 8px;
       color: #fff;
       font-size: 14px;
       outline: none;
-      transition: all 0.3s ease;
+      transition: all 0.2s ease;
     }
 
     input:focus {
       border-color: #38bdf8;
-      box-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
+      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15);
     }
 
-    /* BOTÓN OJITO PARA VISIBILIDAD DE CLAVE */
     .toggle-password {
       position: absolute;
       right: 12px;
       background: none;
       border: none;
-      color: #94a3b8;
       cursor: pointer;
-      font-size: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       padding: 0;
-      transition: color 0.2s;
     }
 
-    .toggle-password:hover {
-      color: #38bdf8;
+    .toggle-icon {
+      width: 18px;
+      height: 18px;
+      fill: #64748b;
+      transition: fill 0.2s;
+    }
+
+    .toggle-password:hover .toggle-icon {
+      fill: #38bdf8;
     }
 
     .btn-login {
       width: 100%;
       padding: 12px;
-      background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+      background: #0284c7;
       color: #fff;
-      font-weight: bold;
+      font-weight: 700;
       border: none;
       border-radius: 8px;
-      font-size: 15px;
+      font-size: 14px;
       cursor: pointer;
       text-transform: uppercase;
       letter-spacing: 0.5px;
-      box-shadow: 0 4px 15px rgba(2, 132, 199, 0.4);
-      transition: all 0.3s ease;
+      transition: all 0.2s ease;
       margin-top: 10px;
     }
 
     .btn-login:hover {
-      background: linear-gradient(135deg, #38bdf8 0%, #0284c7 100%);
-      box-shadow: 0 6px 20px rgba(56, 189, 248, 0.6);
+      background: #0369a1;
       transform: translateY(-1px);
     }
 
-    /* CONTROL DEL RECORRIDO GUIADO */
-    .tour-control-box {
-      margin-top: 25px;
-      padding-top: 15px;
-      border-top: 1px solid rgba(51, 65, 85, 0.6);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .tour-label {
-      font-size: 12px;
-      color: #94a3b8;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .switch {
-      position: relative;
-      display: inline-block;
-      width: 40px;
-      height: 20px;
-    }
-
-    .switch input { opacity: 0; width: 0; height: 0; }
-
-    .slider {
-      position: absolute;
-      cursor: pointer;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background-color: #334155;
-      transition: .3s;
-      border-radius: 20px;
-    }
-
-    .slider:before {
-      position: absolute;
-      content: "";
-      height: 14px;
-      width: 14px;
-      left: 3px;
-      bottom: 3px;
-      background-color: white;
-      transition: .3s;
-      border-radius: 50%;
-    }
-
-    input:checked + .slider { background-color: #0284c7; }
-    input:checked + .slider:before { transform: translateX(20px); }
-
-    /* MODAL DEL RECORRIDO GUIADO / INSTRUCTIVO */
+    /* MODAL DE RECORRIDO GUIADO AL INGRESAR */
     .modal-overlay {
       position: fixed;
       top: 0; left: 0;
       width: 100vw; height: 100vh;
-      background: rgba(0, 0, 0, 0.8);
-      backdrop-filter: blur(5px);
+      background: rgba(2, 6, 23, 0.88);
+      backdrop-filter: blur(8px);
       display: flex;
       justify-content: center;
       align-items: center;
@@ -218,217 +180,151 @@
     .modal-card {
       background: #1e293b;
       border: 1px solid #38bdf8;
-      border-radius: 12px;
-      padding: 25px;
-      max-width: 500px;
+      border-radius: 14px;
+      padding: 30px;
+      max-width: 520px;
       width: 90%;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+      box-shadow: 0 25px 50px rgba(0,0,0,0.7);
       color: #f8fafc;
     }
 
     .modal-card h3 {
       color: #38bdf8;
       font-size: 18px;
-      margin-bottom: 12px;
+      font-weight: 700;
+      margin-bottom: 15px;
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 10px;
     }
 
     .modal-card ul {
-      margin-left: 18px;
+      margin-left: 20px;
       font-size: 13px;
       color: #cbd5e1;
       line-height: 1.6;
-      margin-bottom: 20px;
+      margin-bottom: 25px;
     }
 
-    .modal-card li { margin-bottom: 8px; }
+    .modal-card li { margin-bottom: 10px; }
 
-    .btn-modal-close {
-      background: #0284c7;
+    .btn-modal-start {
+      background: #16a34a;
       color: #fff;
       border: none;
-      padding: 10px 20px;
-      border-radius: 6px;
-      font-weight: bold;
+      padding: 12px;
+      border-radius: 8px;
+      font-weight: 700;
       cursor: pointer;
       width: 100%;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-size: 14px;
+      transition: background 0.2s;
     }
 
+    .btn-modal-start:hover { background: #15803d; }
+
     .hidden { display: none !important; }
-    .error-msg { color: #ef4444; font-size: 12px; text-align: center; margin-top: 10px; }
+    .error-msg { color: #f87171; font-size: 12px; text-align: center; margin-top: 12px; font-weight: 600; }
   </style>
 </head>
 <body>
 
-  <!-- CANVAS FONDO DINÁMICO DE PARTÍCULAS FUTURISTAS -->
-  <canvas id="futuristic-bg"></canvas>
+  <div class="bg-grid"></div>
 
   <div class="login-card">
     <div class="login-header">
+      <!-- ÍCONO VECTORIAL TV -->
+      <svg class="brand-icon" viewBox="0 0 24 24"><path d="M21 3H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h5v2h8v-2h5c1.1 0 1.99-.9 1.99-2L23 5c0-1.1-.9-2-2-2zm0 14H3V5h18v12z"/></svg>
       <h1>Los Mayorga TV</h1>
       <p>Gestor de Pantallas Digitales</p>
     </div>
 
     <form id="login-form" onsubmit="handleLogin(event)">
+      
+      <!-- USUARIO -->
       <div class="form-group">
         <label>Usuario</label>
         <div class="input-wrapper">
-          <span class="input-icon">👤</span>
+          <svg class="field-icon" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
           <input type="text" id="user-input" placeholder="Ingrese su usuario" required>
         </div>
       </div>
 
+      <!-- CONTRASEÑA -->
       <div class="form-group">
-        <label>Palabra Clave / Contraseña</label>
+        <label>Contraseña</label>
         <div class="input-wrapper">
-          <span class="input-icon">🔒</span>
-          <input type="password" id="password-input" placeholder="Ingrese su clave" required>
-          <button type="button" class="toggle-password" onclick="togglePasswordVisibility()" title="Mostrar/Ocultar clave">👁️</button>
+          <svg class="field-icon" viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
+          <input type="password" id="password-input" placeholder="Ingrese su contraseña" required>
+          <button type="button" class="toggle-password" onclick="togglePasswordVisibility('password-input')" title="Mostrar/Ocultar clave">
+            <svg class="toggle-icon" viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+          </button>
         </div>
       </div>
 
-      <button type="submit" class="btn-login">Ingresar al Panel</button>
-      <div id="error-message" class="error-msg hidden">Usuario o palabra clave incorrectos.</div>
-    </form>
-
-    <!-- CONTROL DEL RECORRIDO GUIADO -->
-    <div class="tour-control-box">
-      <div class="tour-label">
-        <span>📘 Recorrido Guiado Interno</span>
+      <!-- PALABRA CLAVE -->
+      <div class="form-group">
+        <label>Palabra Clave</label>
+        <div class="input-wrapper">
+          <svg class="field-icon" viewBox="0 0 24 24"><path d="M12.65 10C11.83 7.67 9.61 6 7 6c-3.31 0-6 2.69-6 6s2.69 6 6 6c2.61 0 4.83-1.67 5.65-4H17v2h2v-2h2v-2h-8.35zM7 14c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/></svg>
+          <input type="password" id="keyword-input" placeholder="Ingrese palabra clave" required>
+          <button type="button" class="toggle-password" onclick="togglePasswordVisibility('keyword-input')" title="Mostrar/Ocultar palabra clave">
+            <svg class="toggle-icon" viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+          </button>
+        </div>
       </div>
-      <label class="switch">
-        <input type="checkbox" id="tour-toggle" onchange="handleTourToggle()">
-        <span class="slider"></span>
-      </label>
-    </div>
+
+      <button type="submit" class="btn-login">Ingresar al Sistema</button>
+      <div id="error-message" class="error-msg hidden">Usuario, contraseña o palabra clave incorrectos.</div>
+    </form>
   </div>
 
-  <!-- MODAL DE GUÍA Y ESPECIFICACIONES TÉCNICAS -->
+  <!-- MODAL DE RECORRIDO GUIADO Y RECOMENDACIONES (SE MUESTRA AL INGRESAR CORRECTAMENTE) -->
   <div id="tour-modal" class="modal-overlay hidden">
     <div class="modal-card">
-      <h3>📘 Guía de Calidad y Medidas para Smart TV</h3>
+      <h3>
+        <svg style="width:22px;height:22px;fill:#38bdf8;" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+        Bienvenido al Panel - Recorrido Guiado y Recomendaciones
+      </h3>
       <ul>
-        <li><strong>Resolución Recomendada:</strong> Utilizar imágenes o diseños en formato horizontal HD (<strong>1280 × 720 píxeles</strong>) o Full HD (<strong>1920 × 1080 píxeles</strong>) con relación de aspecto 16:9.</li>
-        <li><strong>Formatos Compatibles:</strong> Imágenes en <code>JPG</code> o <code>PNG</code>. Videos cortos promocionales en formato <code>MP4</code>.</li>
-        <li><strong>Regla de Márgenes:</strong> Mantener el texto principal dentro del área central para evitar recortes en bordes de televisores antiguos.</li>
-        <li><strong>Tiempos de Exhibición:</strong> Cada placa se muestra automáticamente durante 7 segundos antes de realizar un fundido suave hacia la siguiente.</li>
+        <li><strong>Medidas de Imágenes:</strong> Cargar imágenes horizontales HD (<strong>1280 × 720 px</strong>) o Full HD (<strong>1920 × 1080 px</strong>) en formato 16:9.</li>
+        <li><strong>Formatos Soportados:</strong> Imágenes en <code>JPG</code> o <code>PNG</code>. Videos cortos en <code>MP4</code>.</li>
+        <li><strong>Estrategia de Cantidad:</strong> Se recomienda tener entre <strong>8 y 12 placas activas</strong> por ciclo para evitar aburrir al cliente en caja.</li>
+        <li><strong>Tiempo por Placa:</strong> Cada oferta rotará durante 7 segundos con una transición suave en fundido (*Crossfade*).</li>
+        <li><strong>Etiquetas Especiales:</strong> Activa el interruptor <em>OFERTA 🔥</em> o <em>NUEVO INGRESO ✨</em> según corresponda a cada producto.</li>
       </ul>
-      <button class="btn-modal-close" onclick="closeTourModal()">Entendido y Continuar</button>
+      <button class="btn-modal-start" onclick="goToAdminPanel()">Entrar al Panel de Control</button>
     </div>
   </div>
 
   <script>
-    // CONTROL DE VISIBILIDAD DE CLAVE
-    function togglePasswordVisibility() {
-      const passInput = document.getElementById("password-input");
-      if (passInput.type === "password") {
-        passInput.type = "text";
-      } else {
-        passInput.type = "password";
-      }
+    function togglePasswordVisibility(fieldId) {
+      const field = document.getElementById(fieldId);
+      field.type = (field.type === "password") ? "text" : "password";
     }
 
-    // CONTROL DEL RECORRIDO GUIADO
-    function handleTourToggle() {
-      const isChecked = document.getElementById("tour-toggle").checked;
-      if (isChecked) {
-        document.getElementById("tour-modal").classList.remove("hidden");
-      }
-    }
-
-    function closeTourModal() {
-      document.getElementById("tour-modal").classList.add("hidden");
-    }
-
-    // AUTENTICACIÓN
     function handleLogin(e) {
       e.preventDefault();
       const user = document.getElementById("user-input").value.trim();
       const pass = document.getElementById("password-input").value.trim();
+      const key = document.getElementById("keyword-input").value.trim();
 
-      // Credenciales requeridas
-      if (user === "mayorga" && pass === "mayorga123") {
+      // Validación de credenciales
+      if (user === "mayorga" && pass === "mayorga123" && key === "tv2026") {
         sessionStorage.setItem("internal_auth_mayorga", "true");
-        window.location.href = "admin.html";
+        // AL SER CORRECTO, ABRE EL RECORRIDO GUIADO Y RECOMENDACIONES
+        document.getElementById("tour-modal").classList.remove("hidden");
+        document.getElementById("error-message").classList.add("hidden");
       } else {
         document.getElementById("error-message").classList.remove("hidden");
       }
     }
 
-    // ANIMACIÓN DEL CANVAS FUTURISTA EN MOVIMIENTO
-    const canvas = document.getElementById('futuristic-bg');
-    const ctx = canvas.getContext('2d');
-
-    let particles = [];
-    const particleCount = 65;
-
-    function resizeCanvas() {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
+    function goToAdminPanel() {
+      window.location.href = "admin.html";
     }
-
-    window.addEventListener('resize', resizeCanvas);
-    resizeCanvas();
-
-    class Particle {
-      constructor() {
-        this.x = Math.random() * canvas.width;
-        this.y = Math.random() * canvas.height;
-        this.vx = (Math.random() - 0.5) * 1.2;
-        this.vy = (Math.random() - 0.5) * 1.2;
-        this.radius = Math.random() * 2 + 1;
-      }
-
-      update() {
-        this.x += this.vx;
-        this.y += this.vy;
-
-        if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
-        if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
-      }
-
-      draw() {
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-        ctx.fillStyle = '#38bdf8';
-        ctx.shadowBlur = 10;
-        ctx.shadowColor = '#0284c7';
-        ctx.fill();
-      }
-    }
-
-    for (let i = 0; i < particleCount; i++) {
-      particles.push(new Particle());
-    }
-
-    function animate() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      for (let i = 0; i < particles.length; i++) {
-        particles[i].update();
-        particles[i].draw();
-
-        for (let j = i + 1; j < particles.length; j++) {
-          const dx = particles[i].x - particles[j].x;
-          const dy = particles[i].y - particles[j].y;
-          const distance = Math.sqrt(dx * dx + dy * dy);
-
-          if (distance < 130) {
-            ctx.beginPath();
-            ctx.moveTo(particles[i].x, particles[i].y);
-            ctx.lineTo(particles[j].x, particles[j].y);
-            ctx.strokeStyle = `rgba(56, 189, 248, ${1 - distance / 130})`;
-            ctx.lineWidth = 0.6;
-            ctx.stroke();
-          }
-        }
-      }
-      requestAnimationFrame(animate);
-    }
-
-    animate();
   </script>
 </body>
 </html>
