@@ -7,7 +7,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700;900&family=Roboto+Condensed:wght@700;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Oswald:wght@500;700&family=Roboto+Condensed:wght@700;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
 
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -15,20 +15,49 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
 
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; }
-    body { background: #0f172a; color: #f8fafc; padding: 20px; display: flex; justify-content: center; }
-    .container { width: 100%; max-width: 1100px; }
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+    
+    body {
+      background-color: #030712;
+      color: #f8fafc;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      position: relative;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* CANVAS DE FONDO DINÁMICO EN MOVIMIENTO */
+    #futuristic-bg {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .container { width: 100%; max-width: 1100px; position: relative; z-index: 10; }
     
     .admin-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 25px; }
     @media (max-width: 900px) { .admin-grid { grid-template-columns: 1fr; } }
 
-    .card { background: #1e293b; padding: 25px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); border: 1px solid #334155; }
+    .card {
+      background: rgba(30, 41, 59, 0.9);
+      backdrop-filter: blur(12px);
+      padding: 25px;
+      border-radius: 14px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+      border: 1px solid rgba(56, 189, 248, 0.2);
+    }
+
     .header-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-    h2 { color: #38bdf8; font-size: 20px; }
+    h2 { color: #38bdf8; font-size: 18px; font-weight: 700; }
     
     .form-group { margin-bottom: 15px; }
-    label { display: block; margin-bottom: 5px; font-size: 14px; color: #94a3b8; }
-    input, select { width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #334155; background: #0f172a; color: #fff; font-size: 15px; }
+    label { display: block; margin-bottom: 5px; font-size: 13px; color: #94a3b8; font-weight: 600; text-transform: uppercase; }
+    input, select { width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #334155; background: #0f172a; color: #fff; font-size: 14px; outline: none; }
+    input:focus { border-color: #38bdf8; box-shadow: 0 0 0 2px rgba(56,189,248,0.2); }
     .row { display: flex; gap: 15px; }
     .row .form-group { flex: 1; }
 
@@ -43,270 +72,82 @@
       margin-bottom: 15px;
     }
 
-    .badge-option {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
+    .badge-option { display: flex; flex-direction: column; gap: 6px; }
 
     .status-pill {
-      font-size: 11px;
-      font-weight: bold;
-      padding: 2px 6px;
-      border-radius: 12px;
-      text-transform: uppercase;
-      width: fit-content;
+      font-size: 11px; font-weight: bold; padding: 2px 6px; border-radius: 12px; text-transform: uppercase; width: fit-content;
     }
     .status-pill.active { background: #15803d; color: #86efac; }
     .status-pill.inactive { background: #7f1d1d; color: #fca5a5; }
 
     button { padding: 10px 18px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.2s; }
-    .btn-primary { background: #0284c7; color: #fff; width: 100%; padding: 12px; font-size: 16px; margin-top: 10px; }
+    .btn-primary { background: #0284c7; color: #fff; width: 100%; padding: 12px; font-size: 15px; margin-top: 10px; text-transform: uppercase; }
     .btn-primary:hover { background: #0369a1; }
     .btn-save-order { background: #16a34a; color: #fff; }
-    .btn-edit { background: #eab308; color: #0f172a; font-size: 13px; padding: 6px 12px; }
+    .btn-edit { background: #eab308; color: #0f172a; font-size: 12px; padding: 6px 12px; }
     .btn-edit:hover { background: #ca8a04; }
     .btn-cancel-edit { background: #64748b; color: #fff; width: 100%; padding: 10px; font-size: 14px; margin-top: 8px; }
-    .btn-danger { background: #dc2626; color: #fff; font-size: 13px; padding: 6px 12px; }
-    .btn-logout { background: #475569; color: #fff; font-size: 13px; padding: 8px 14px; }
+    .btn-danger { background: #dc2626; color: #fff; font-size: 12px; padding: 6px 12px; }
+    
+    .nav-buttons { display: flex; gap: 8px; align-items: center; }
+    .btn-tour { background: #0284c7; color: #fff; font-size: 12px; padding: 8px 12px; }
+    .btn-logout { background: #475569; color: #fff; font-size: 12px; padding: 8px 12px; }
 
-    /* DASHBOARD MÉTRICAS Y MARKETING */
     .metrics-panel {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 15px;
-      background: #0f172a;
-      padding: 15px;
-      border-radius: 8px;
-      border: 1px solid #334155;
-      margin-bottom: 15px;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 15px; background: #0f172a; padding: 15px; border-radius: 8px; border: 1px solid #334155; margin-bottom: 15px;
     }
     .metric-card { text-align: center; }
     .metric-value { font-size: 22px; font-weight: 900; color: #38bdf8; }
     .metric-label { font-size: 12px; color: #94a3b8; }
 
     .marketing-tip {
-      background: #1e1b4b;
-      border-left: 4px solid #818cf8;
-      padding: 12px;
-      border-radius: 6px;
-      font-size: 13px;
-      color: #c7d2fe;
-      margin-bottom: 15px;
+      background: #1e1b4b; border-left: 4px solid #818cf8; padding: 12px; border-radius: 6px; font-size: 13px; color: #c7d2fe; margin-bottom: 15px;
     }
 
-    /* PREVISUALIZACIÓN VISTA PREVIA */
     .preview-container {
-      position: relative;
-      width: 100%;
-      padding-top: 56.25%;
-      background: #000;
-      border-radius: 8px;
-      overflow: hidden;
-      border: 2px solid #38bdf8;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.8);
-      font-family: 'Oswald', sans-serif;
+      position: relative; width: 100%; padding-top: 56.25%; background: #000; border-radius: 8px; overflow: hidden; border: 2px solid #38bdf8; box-shadow: 0 5px 15px rgba(0,0,0,0.8); font-family: 'Oswald', sans-serif;
     }
-    
-    .preview-bg {
-      position: absolute;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      object-fit: cover;
-      z-index: 1;
-      display: none;
-    }
+    .preview-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; display: none; }
+    .preview-placeholder { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; color: #64748b; font-size: 14px; z-index: 1; text-align: center; padding: 20px; }
 
-    .preview-placeholder {
-      position: absolute;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      color: #64748b;
-      font-family: system-ui, sans-serif;
-      font-size: 14px;
-      z-index: 1;
-      text-align: center;
-      padding: 20px;
+    .badge-oferta-3d, .badge-nuevo-3d {
+      position: absolute; top: 18%; left: 10%; z-index: 10; color: #fff; font-weight: 900; font-size: 0.65rem; padding: 1px 7px; border-radius: 4px; text-transform: uppercase; border: 1px solid #fff; box-shadow: 0 2px 6px rgba(0,0,0,0.8); display: flex; align-items: center; gap: 3px; transform: rotate(-3deg);
     }
-
-    /* INSIGNIAS EN PREVISUALIZACIÓN */
-    .badge-oferta-3d {
-      position: absolute;
-      top: 18%;
-      left: 10%;
-      z-index: 10;
-      background: linear-gradient(180deg, #ffe600 0%, #ff8800 50%, #d90000 100%);
-      color: #fff;
-      font-weight: 900;
-      font-size: 0.65rem;
-      padding: 1px 7px;
-      border-radius: 4px;
-      text-transform: uppercase;
-      border: 1px solid #fff;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.8);
-      display: flex;
-      align-items: center;
-      gap: 3px;
-      transform: rotate(-3deg);
-    }
-
-    .badge-nuevo-3d {
-      position: absolute;
-      top: 18%;
-      left: 10%;
-      z-index: 10;
-      background: linear-gradient(180deg, #38bdf8 0%, #0284c7 50%, #1e3a8a 100%);
-      color: #fff;
-      font-weight: 900;
-      font-size: 0.65rem;
-      padding: 1px 7px;
-      border-radius: 4px;
-      text-transform: uppercase;
-      border: 1px solid #fff;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.8);
-      display: flex;
-      align-items: center;
-      gap: 3px;
-      transform: rotate(-3deg);
-    }
-
-    .fire-icon {
-      display: inline-block;
-      animation: flameAnim 0.8s infinite alternate ease-in-out;
-    }
-
-    @keyframes flameAnim {
-      0% { transform: scale(1) rotate(-5deg); filter: drop-shadow(0 0 1px #ff3300); }
-      100% { transform: scale(1.2) rotate(5deg); filter: drop-shadow(0 0 5px #ffff00); }
-    }
+    .badge-oferta-3d { background: linear-gradient(180deg, #ffe600 0%, #ff8800 50%, #d90000 100%); }
+    .badge-nuevo-3d { background: linear-gradient(180deg, #38bdf8 0%, #0284c7 50%, #1e3a8a 100%); }
 
     .preview-legal-banner {
-      position: absolute;
-      bottom: 8%;
-      left: 10%;
-      z-index: 10;
-      background: #dc2626;
-      color: #ffffff;
-      font-family: system-ui, sans-serif;
-      font-size: 0.55rem;
-      font-weight: 800;
-      padding: 3px 8px;
-      border-radius: 3px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.8);
-      max-width: 42%;
-      line-height: 1.1;
-      text-transform: uppercase;
+      position: absolute; bottom: 8%; left: 10%; z-index: 10; background: #dc2626; color: #ffffff; font-family: system-ui, sans-serif; font-size: 0.55rem; font-weight: 800; padding: 3px 8px; border-radius: 3px; box-shadow: 0 2px 8px rgba(0,0,0,0.8); max-width: 42%; line-height: 1.1; text-transform: uppercase;
     }
 
     .preview-overlay {
-      position: absolute;
-      top: 0; left: 0;
-      width: 55%; height: 100%;
-      z-index: 2;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      padding-left: 10%;
-      color: #fff;
-      text-transform: uppercase;
+      position: absolute; top: 0; left: 0; width: 55%; height: 100%; z-index: 2; display: flex; flex-direction: column; justify-content: center; padding-left: 10%; color: #fff; text-transform: uppercase;
     }
-
-    .preview-title {
-      font-size: 2.2rem;
-      font-weight: 700;
-      color: #38bdf8;
-      line-height: 0.85;
-      word-break: break-word;
-      text-shadow: 0 4px 15px rgba(0,0,0,0.9), 0 2px 6px rgba(0,0,0,0.8);
-    }
-
-    .preview-vol {
-      font-size: 2rem;
-      font-weight: 700;
-      color: #fef08a;
-      line-height: 0.8;
-      text-shadow: 0 4px 15px rgba(0,0,0,0.9), 0 2px 6px rgba(0,0,0,0.8);
-    }
-
-    .preview-subtitle {
-      font-size: 0.8rem;
-      font-weight: 700;
-      color: #ffffff;
-      margin-top: 6px;
-      text-shadow: 0 3px 10px rgba(0,0,0,0.95), 0 1px 4px rgba(0,0,0,0.9);
-    }
-
+    .preview-title { font-size: 2.2rem; font-weight: 700; color: #38bdf8; line-height: 0.85; text-shadow: 0 4px 15px rgba(0,0,0,0.9); }
+    .preview-vol { font-size: 2rem; font-weight: 700; color: #fef08a; line-height: 0.8; text-shadow: 0 4px 15px rgba(0,0,0,0.9); }
+    .preview-subtitle { font-size: 0.8rem; font-weight: 700; color: #ffffff; margin-top: 6px; text-shadow: 0 3px 10px rgba(0,0,0,0.95); }
     .preview-details { display: flex; align-items: baseline; gap: 10px; margin-top: 6px; }
-
-    .preview-pack {
-      font-size: 0.8rem;
-      font-weight: 700;
-      color: #ffffff;
-      line-height: 0.95;
-      max-width: 45%;
-      text-shadow: 0 3px 10px rgba(0,0,0,0.95), 0 1px 4px rgba(0,0,0,0.9);
-    }
+    .preview-pack { font-size: 0.8rem; font-weight: 700; color: #ffffff; line-height: 0.95; max-width: 45%; text-shadow: 0 3px 10px rgba(0,0,0,0.95); }
 
     .preview-price {
-      position: absolute;
-      bottom: 14%;
-      right: 12%;
-      z-index: 3;
-      background-color: #fff;
-      padding: 2px 10px;
-      font-family: 'Roboto Condensed', sans-serif;
-      color: #000;
-      font-size: 1.6rem;
-      font-weight: 900;
-      display: flex;
-      align-items: flex-start;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.6);
-      border-radius: 4px;
+      position: absolute; bottom: 14%; right: 12%; z-index: 3; background-color: #fff; padding: 2px 10px; font-family: 'Roboto Condensed', sans-serif; color: #000; font-size: 1.6rem; font-weight: 900; display: flex; align-items: flex-start; box-shadow: 0 5px 15px rgba(0,0,0,0.6); border-radius: 4px;
     }
-
     .preview-price .cents { font-size: 0.8rem; text-decoration: underline; margin-left: 2px; }
 
     .product-list { list-style: none; }
     .product-item {
-      background: #334155;
-      padding: 12px 15px;
-      border-radius: 8px;
-      margin-bottom: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
+      background: #0f172a; padding: 12px 15px; border-radius: 8px; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; gap: 12px; border: 1px solid #334155;
     }
     
-    .drag-handle {
-      cursor: grab;
-      font-size: 20px;
-      color: #64748b;
-      user-select: none;
-      padding: 5px;
-    }
+    .drag-handle { cursor: grab; font-size: 20px; color: #64748b; user-select: none; padding: 5px; }
     .drag-handle:active { cursor: grabbing; color: #38bdf8; }
 
     .order-number {
-      background: #0f172a;
-      color: #38bdf8;
-      font-weight: 900;
-      font-size: 14px;
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border: 1px solid #0284c7;
-      flex-shrink: 0;
+      background: #1e293b; color: #38bdf8; font-weight: 900; font-size: 14px; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 1px solid #0284c7; flex-shrink: 0;
     }
 
     .product-info { display: flex; align-items: center; gap: 12px; flex: 1; }
-    .product-thumb { width: 55px; height: 55px; object-fit: cover; border-radius: 6px; background: #0f172a; }
+    .product-thumb { width: 55px; height: 55px; object-fit: cover; border-radius: 6px; background: #1e293b; }
     .product-details h4 { font-size: 15px; color: #fff; }
     .product-details p { font-size: 12px; color: #94a3b8; }
     .action-buttons { display: flex; align-items: center; gap: 8px; }
@@ -318,10 +159,13 @@
     input:checked + .slider { background-color: #22c55e; }
     input:checked + .slider:before { transform: translateX(22px); }
 
-    .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.8); display: flex; justify-content: center; align-items: center; z-index: 9999; }
-    .modal-box { background: #1e293b; padding: 25px; border-radius: 12px; max-width: 400px; width: 90%; text-align: center; border: 1px solid #475569; }
-    .modal-box h3 { color: #f8fafc; margin-bottom: 10px; }
-    .modal-box p { color: #94a3b8; font-size: 14px; margin-bottom: 20px; }
+    /* MODALES */
+    .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.8); display: flex; justify-content: center; align-items: center; z-index: 9999; backdrop-filter: blur(5px); }
+    .modal-box { background: #1e293b; padding: 25px; border-radius: 12px; max-width: 480px; width: 90%; border: 1px solid #38bdf8; color: #f8fafc; }
+    .modal-box h3 { color: #38bdf8; margin-bottom: 12px; font-size: 18px; }
+    .modal-box p, .modal-box ul { color: #cbd5e1; font-size: 13px; margin-bottom: 20px; line-height: 1.6; }
+    .modal-box ul { margin-left: 18px; }
+    .modal-box li { margin-bottom: 6px; }
     .modal-actions { display: flex; gap: 10px; justify-content: center; }
 
     .hidden { display: none !important; }
@@ -332,14 +176,20 @@
 </head>
 <body>
 
+  <!-- CANVAS DE FONDO DINÁMICO EN MOVIMIENTO -->
+  <canvas id="futuristic-bg"></canvas>
+
   <div class="container">
     
     <div class="admin-grid">
-      <!-- FORMULARIO DE CARGA -->
+      <!-- FORMULARIO -->
       <div class="card">
         <div class="header-bar">
           <h2 id="form-header-title">Cargar Nueva Oferta</h2>
-          <button class="btn-logout" onclick="logout()">Cerrar Sesión</button>
+          <div class="nav-buttons">
+            <button class="btn-tour" onclick="openTourModal()">📘 Guía TV</button>
+            <button class="btn-logout" onclick="logout()">Salir</button>
+          </div>
         </div>
 
         <form id="product-form">
@@ -348,7 +198,6 @@
             <input type="file" id="prod-img" accept="image/*,video/mp4" onchange="updatePreviewMedia(this)">
           </div>
 
-          <!-- SELECCIÓN DE ETIQUETA ESPECIAL -->
           <div class="badge-selection-grid">
             <div class="badge-option">
               <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -484,9 +333,24 @@
     </div>
   </div>
 
+  <!-- MODAL DE GUÍA Y RECOMENDACIONES (ACCESIBLE DESDE EL BOTÓN GUÍA TV) -->
+  <div id="tour-modal" class="modal-overlay hidden">
+    <div class="modal-box" style="text-align: left;">
+      <h3>📘 Guía Técnica y Recomendaciones</h3>
+      <ul>
+        <li><strong>Resolución de Imágenes:</strong> Utilizar diseños horizontales en formato 16:9, idealmente <strong>1280 × 720 px</strong> o <strong>1920 × 1080 px</strong> (Full HD).</li>
+        <li><strong>Formatos Soportados:</strong> Imágenes <code>JPG</code> o <code>PNG</code> de alta calidad. Videos cortos animados en formato <code>MP4</code>.</li>
+        <li><strong>Cantidad de Ofertas:</strong> Se recomienda mantener entre <strong>8 y 12 placas activas</strong> en simultáneo para lograr un ciclo dinámico sin saturar al cliente en caja.</li>
+        <li><strong>Tiempos de Rotación:</strong> Cada placa se muestra automáticamente durante 7 segundos con transiciones suaves en fundido (*Crossfade*).</li>
+        <li><strong>Insignias:</strong> Utiliza el interruptor <em>OFERTA 🔥</em> o <em>NUEVO INGRESO ✨</em> para destacar visualmente el producto.</li>
+      </ul>
+      <button class="btn-primary" onclick="closeTourModal()">Entendido, Cerrar Guía</button>
+    </div>
+  </div>
+
   <!-- MODALES DE CONFIRMACIÓN -->
   <div id="modal-confirm" class="modal-overlay hidden">
-    <div class="modal-box">
+    <div class="modal-box" style="text-align: center;">
       <h3 id="modal-title">¿Estás seguro?</h3>
       <p id="modal-msg">Esta acción actualizará las pantallas.</p>
       <div class="modal-actions">
@@ -497,7 +361,7 @@
   </div>
 
   <div id="modal-reconfirm" class="modal-overlay hidden">
-    <div class="modal-box">
+    <div class="modal-box" style="text-align: center;">
       <h3 style="color:#ef4444;">¡RECONFIRMACIÓN!</h3>
       <p id="modal-reconfirm-msg">¿Confirmas aplicar este cambio?</p>
       <div class="modal-actions">
@@ -515,6 +379,14 @@
     function logout() {
       sessionStorage.removeItem("internal_auth_mayorga");
       window.location.href = "login.html";
+    }
+
+    function openTourModal() {
+      document.getElementById("tour-modal").classList.remove("hidden");
+    }
+
+    function closeTourModal() {
+      document.getElementById("tour-modal").classList.add("hidden");
     }
 
     const CLOUDINARY_CLOUD_NAME = "aibqthzz"; 
@@ -614,8 +486,7 @@
       try {
         const canvas = document.createElement("canvas");
         const ctx = canvas.getContext("2d");
-        canvas.width = 100;
-        canvas.height = 100;
+        canvas.width = 100; canvas.height = 100;
         ctx.drawImage(mediaElement, 0, 0, 100, 100);
 
         const imgData = ctx.getImageData(0, 0, 100, 100).data;
@@ -657,7 +528,6 @@
         const reader = new FileReader();
         reader.onload = function(e) {
           placeholder.style.display = "none";
-
           if (file.type.startsWith("video/")) {
             bgImg.style.display = "none";
             bgVid.src = e.target.result;
@@ -677,10 +547,7 @@
     function loadProductsFromFirebase() {
       db.collection("productos").onSnapshot(snapshot => {
         productosList = [];
-        snapshot.forEach(doc => {
-          productosList.push({ id: doc.id, ...doc.data() });
-        });
-        
+        snapshot.forEach(doc => productosList.push({ id: doc.id, ...doc.data() }));
         productosList.sort((a, b) => (a.orden ?? 0) - (b.orden ?? 0));
         renderProductList();
         updateMarketingMetrics();
@@ -700,13 +567,12 @@
       document.getElementById("metric-total-time").textContent = `${mins} min ${secs} sec`;
 
       const tipBox = document.getElementById("marketing-tip-box");
-
       if (totalCount < 5) {
-        tipBox.innerHTML = `⚠️ <strong>Pocas imágenes en rotación (${totalCount}):</strong> Se recomienda agregar al menos 8 a 10 productos. Con pocas placas el contenido se vuelve muy repetitivo para el cliente en caja.`;
+        tipBox.innerHTML = `⚠️ <strong>Pocas imágenes en rotación (${totalCount}):</strong> Se recomienda agregar al menos 8 a 10 productos para evitar repetición en caja.`;
       } else if (totalCount >= 5 && totalCount <= 12) {
-        tipBox.innerHTML = `✅ <strong>Cantidad Óptima (${totalCount} ofertas):</strong> El ciclo dura aproximadamente ${totalSeconds} segundos, ideal para captar la atención sin aburrir ni hacer esperar al cliente.`;
+        tipBox.innerHTML = `✅ <strong>Cantidad Óptima (${totalCount} ofertas):</strong> El ciclo dura ${totalSeconds}s, ideal para captar la atención de los clientes.`;
       } else {
-        tipBox.innerHTML = `💡 <strong>Atención (${totalCount} ofertas):</strong> El ciclo supera el minuto y medio. Considera desactivar ofertas secundarias para destacar únicamente los productos con mayor margen comercial.`;
+        tipBox.innerHTML = `💡 <strong>Atención (${totalCount} ofertas):</strong> El ciclo supera el minuto y medio. Considera desactivar ofertas secundarias.`;
       }
     }
 
@@ -741,13 +607,11 @@
               <p>${p.subtitulo || ''}</p>
             </div>
           </div>
-          
           <div class="action-buttons">
             <label class="switch" title="Activar/Desactivar">
               <input type="checkbox" ${p.activo !== false ? 'checked' : ''} onchange="requestToggleActive('${p.id}', this.checked)">
               <span class="slider"></span>
             </label>
-            
             <button class="btn-edit" onclick="startEditing('${p.id}')">Editar</button>
             <button class="btn-danger" onclick="requestDelete('${p.id}')">Eliminar</button>
           </div>
@@ -801,7 +665,6 @@
       editingProductId = null;
       currentExistingImageUrl = "";
       currentExistingMediaType = "image";
-
       document.getElementById("product-form").reset();
       document.getElementById("prod-show-oferta").checked = false;
       document.getElementById("prod-show-nuevo").checked = false;
@@ -852,9 +715,7 @@
     function requestUpload() {
       const fileInput = document.getElementById("prod-img");
       if (!editingProductId && !fileInput.files[0]) return alert("Selecciona un archivo");
-
-      const actionText = editingProductId ? "¿Guardar Cambios?" : "¿Publicar Oferta?";
-      openModal(actionText, "Se actualizarán las pantallas de las TV.", processUpload);
+      openModal(editingProductId ? "¿Guardar Cambios?" : "¿Publicar Oferta?", "Se actualizarán las pantallas de las TV.", processUpload);
     }
 
     function requestSaveOrder() {
@@ -877,14 +738,11 @@
       showStatus("Guardando nuevo orden...");
       const batch = db.batch();
       const items = Array.from(sortableList.children);
-      
       items.forEach((li, index) => {
         if(li.dataset.id) {
-          const ref = db.collection("productos").doc(li.dataset.id);
-          batch.update(ref, { orden: index });
+          batch.update(db.collection("productos").doc(li.dataset.id), { orden: index });
         }
       });
-
       await batch.commit();
       showStatus("¡Orden actualizado!");
       closeModal();
@@ -903,7 +761,6 @@
           detectedType = isVideo ? "video" : "image";
 
           showStatus(isVideo ? "Subiendo video MP4..." : "Subiendo imagen...");
-          
           const formData = new FormData();
           formData.append("file", file);
           formData.append("upload_preset", CLOUDINARY_PRESET);
@@ -915,7 +772,6 @@
           const res = await fetch(endpoint, { method: "POST", body: formData });
           if (!res.ok) throw new Error("Error en subida de archivo");
           const data = await res.json();
-          
           finalImageUrl = isVideo ? data.secure_url : data.secure_url.replace('/upload/', '/upload/w_1280,f_auto,q_auto/');
         }
 
@@ -953,6 +809,68 @@
         showStatus("Error: " + err.message, true);
       }
     }
+
+    // ANIMACIÓN CANVAS PARTÍCULAS EN ADMIN
+    const canvas = document.getElementById('futuristic-bg');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+    const particleCount = 50;
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    class Particle {
+      constructor() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
+        this.vx = (Math.random() - 0.5) * 0.8;
+        this.vy = (Math.random() - 0.5) * 0.8;
+        this.radius = Math.random() * 2 + 1;
+      }
+      update() {
+        this.x += this.vx;
+        this.y += this.vy;
+        if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+        if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+      }
+      draw() {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fillStyle = '#38bdf8';
+        ctx.shadowBlur = 6;
+        ctx.shadowColor = '#0284c7';
+        ctx.fill();
+      }
+    }
+
+    for (let i = 0; i < particleCount; i++) particles.push(new Particle());
+
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for (let i = 0; i < particles.length; i++) {
+        particles[i].update();
+        particles[i].draw();
+        for (let j = i + 1; j < particles.length; j++) {
+          const dx = particles[i].x - particles[j].x;
+          const dy = particles[i].y - particles[j].y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < 130) {
+            ctx.beginPath();
+            ctx.moveTo(particles[i].x, particles[i].y);
+            ctx.lineTo(particles[j].x, particles[j].y);
+            ctx.strokeStyle = `rgba(56, 189, 248, ${1 - dist / 130})`;
+            ctx.lineWidth = 0.4;
+            ctx.stroke();
+          }
+        }
+      }
+      requestAnimationFrame(animate);
+    }
+    animate();
 
     loadProductsFromFirebase();
   </script>
