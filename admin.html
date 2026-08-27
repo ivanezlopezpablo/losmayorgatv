@@ -72,7 +72,9 @@
     .btn-danger { background: #dc2626; color: #fff; font-size: 12px; padding: 6px 12px; }
 
     .nav-buttons { display: flex; gap: 8px; align-items: center; }
-    .btn-tour { background: #0284c7; color: #fff; font-size: 12px; padding: 8px 12px; }
+    .btn-info { background: #0284c7; color: #fff; font-size: 12px; padding: 8px 12px; border-radius: 6px; font-weight: bold; display: flex; align-items: center; gap: 4px; }
+    .btn-info:hover { background: #0369a1; }
+    .btn-tour { background: #38bdf8; color: #0f172a; font-size: 12px; padding: 8px 12px; font-weight: bold; }
     .btn-logout { background: #475569; color: #fff; font-size: 12px; padding: 8px 12px; }
 
     /* ESTILOS DE LA GALERÍA DE MARCOS */
@@ -166,10 +168,36 @@
     input:checked + .slider { background-color: #22c55e; }
     input:checked + .slider:before { transform: translateX(22px); }
 
-    /* SPOTLIGHT TOUR */
-    .tour-backdrop { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.85); z-index: 9990; pointer-events: auto; }
-    .tour-spotlight-highlight { position: relative !important; z-index: 9995 !important; box-shadow: 0 0 0 6px #38bdf8, 0 0 35px #0284c7 !important; border-radius: 10px !important; background: rgba(15, 23, 42, 0.98) !important; }
-    .tour-popover-card { position: fixed; z-index: 9999; background: #1e293b; border: 2px solid #38bdf8; border-radius: 14px; padding: 22px; max-width: 450px; width: 90%; box-shadow: 0 20px 50px rgba(0,0,0,0.9); color: #f8fafc; }
+    /* SISTEMA DE RECORRIDO SPOTLIGHT CON HOLE/RECORTE REAL */
+    .tour-backdrop {
+      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+      background: rgba(0, 0, 0, 0.85);
+      z-index: 9990;
+      pointer-events: auto;
+    }
+
+    .tour-spotlight-highlight {
+      position: relative !important;
+      z-index: 9995 !important;
+      box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.85), 0 0 25px #38bdf8 !important;
+      border-radius: 12px !important;
+      transition: all 0.3s ease;
+    }
+
+    .tour-popover-card {
+      position: fixed;
+      z-index: 9999;
+      background: #1e293b;
+      border: 2px solid #38bdf8;
+      border-radius: 14px;
+      padding: 22px;
+      max-width: 420px;
+      width: 90%;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.9);
+      color: #f8fafc;
+      transition: all 0.3s ease;
+    }
+
     .tour-step-badge { background: #0284c7; color: #fff; font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 20px; text-transform: uppercase; width: fit-content; margin-bottom: 10px; }
     .tour-title { color: #38bdf8; font-size: 17px; font-weight: 700; margin-bottom: 8px; }
     .tour-content { font-size: 13px; color: #cbd5e1; line-height: 1.6; margin-bottom: 18px; }
@@ -178,8 +206,14 @@
     .btn-tour-prev { background: #475569; color: #fff; font-size: 12px; padding: 8px 12px; border-radius: 6px; font-weight: bold; }
     .btn-tour-skip { background: transparent; color: #94a3b8; font-size: 12px; text-decoration: underline; padding: 6px; cursor: pointer; border: none; }
 
+    /* ESTILOS DEL MODAL DE INFORMACIÓN TÉCNICA */
+    .info-modal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 15px 0; text-align: left; }
+    .info-box-card { background: #0f172a; border: 1px solid #334155; padding: 12px; border-radius: 8px; }
+    .info-box-card h5 { color: #38bdf8; font-size: 13px; margin-bottom: 4px; display: flex; align-items: center; gap: 6px; }
+    .info-box-card p { font-size: 11.5px; color: #cbd5e1; line-height: 1.4; margin: 0; }
+
     .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.85); display: flex; justify-content: center; align-items: center; z-index: 9999; backdrop-filter: blur(5px); }
-    .modal-box { background: #1e293b; padding: 25px; border-radius: 12px; max-width: 480px; width: 90%; border: 1px solid #38bdf8; color: #f8fafc; }
+    .modal-box { background: #1e293b; padding: 25px; border-radius: 12px; max-width: 520px; width: 90%; border: 1px solid #38bdf8; color: #f8fafc; }
     .modal-box h3 { color: #38bdf8; margin-bottom: 12px; font-size: 18px; }
     .modal-box p { color: #cbd5e1; font-size: 13px; margin-bottom: 20px; line-height: 1.6; }
     .modal-actions { display: flex; gap: 10px; justify-content: center; }
@@ -223,10 +257,10 @@
         <button class="btn-filter" onclick="filterGallery('ofertas', this)">🔥 Cyber / Aniversario</button>
       </div>
 
-      <!-- GRILLA DE MARCOS DISPONIBLES EN EL REPOSITORIO -->
+      <!-- GRILLA DE MARCOS DISPONIBLES -->
       <div id="gallery-grid-container" class="gallery-grid"></div>
 
-      <!-- FORMULARIO PARA AÑADIR UN NUEVO MARCO AL REPOSITORIO -->
+      <!-- FORMULARIO PARA AÑADIR UN NUEVO MARCO -->
       <div class="upload-new-frame-box">
         <strong style="color:#fff; font-size:12px; width:100%;">➕ Agregar Nuevo Marco al Repositorio:</strong>
         <input type="text" id="new-frame-title" placeholder="Nombre del Marco (ej. Navidad Copos)" style="flex:1; min-width:180px; padding:8px;">
@@ -251,6 +285,10 @@
         <div class="header-bar">
           <h2 id="form-header-title">Cargar Nueva Oferta</h2>
           <div class="nav-buttons">
+            <button class="btn-info" onclick="openInfoModal()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+              Info
+            </button>
             <button class="btn-tour" onclick="startGuidedTour(0)">📘 Recorrido Guiado</button>
             <button class="btn-logout" onclick="logout()">Salir</button>
           </div>
@@ -416,9 +454,7 @@
     </div>
   </div>
 
-  <!-- ELEMENTOS PARA RECORRIDO GUIADO SPOTLIGHT -->
-  <div id="tour-backdrop" class="tour-backdrop hidden"></div>
-  
+  <!-- ELEMENTOS DE RECORRIDO SPOTLIGHT CON RECORTE REAL -->
   <div id="tour-popover" class="tour-popover-card hidden">
     <div id="tour-step-badge" class="tour-step-badge">Paso 1 de 5</div>
     <h3 id="tour-step-title" class="tour-title">Bienvenido</h3>
@@ -432,7 +468,47 @@
     </div>
   </div>
 
-  <!-- MODALES DE CONFIRMACIÓN -->
+  <!-- MODAL DE INFORMACIÓN TÉCNICA (MEDIDAS Y RECOMENDACIONES) -->
+  <div id="modal-info" class="modal-overlay hidden">
+    <div class="modal-box" style="text-align: left;">
+      <h3 style="display:flex; align-items:center; gap:8px;">
+        ℹ️ Recomendaciones Técnicas de Diseño
+      </h3>
+      <p style="font-size:12px; color:#94a3b8; margin-bottom:12px;">Especificaciones ideales para asegurar máxima calidad visual en Smart TV.</p>
+      
+      <div class="info-modal-grid">
+        <div class="info-box-card">
+          <h5>📐 Resolución de TV</h5>
+          <p><strong>1920 x 1080 px</strong> (Full HD / Relación de aspecto 16:9 horizontal).</p>
+        </div>
+
+        <div class="info-box-card">
+          <h5>🖼️ Marcos Temáticos</h5>
+          <p>Formato <strong>PNG Transparente</strong> obligatoriamente. Fondo libre en el centro.</p>
+        </div>
+
+        <div class="info-box-card">
+          <h5>📸 Fotos de Producto</h5>
+          <p>Formatos <strong>JPG, PNG o WEBP</strong>. Peso ideal menor a <strong>3 MB</strong> para carga veloz.</p>
+        </div>
+
+        <div class="info-box-card">
+          <h5>📹 Videos Promocionales</h5>
+          <p>Formato <strong>MP4 (H.264)</strong>. Duración recomendada de 7 a 15 segundos max <strong>25 MB</strong>.</p>
+        </div>
+      </div>
+
+      <div style="background:#0f172a; border-left:3px solid #eab308; padding:10px; border-radius:4px; font-size:11.5px; color:#fef08a; margin-bottom:18px;">
+        💡 <strong>Tip de Fotos Editadas:</strong> Si la foto ya trae el título y texto grabado en el diseño, deja el campo <em>Título</em> vacío en el panel para que no se pise el texto.
+      </div>
+
+      <div class="modal-actions" style="justify-content: flex-end;">
+        <button class="btn-primary" style="width:auto; padding:8px 20px;" onclick="closeInfoModal()">Entendido</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODALES DE CONFIRMACIÓN DE ACCIONES -->
   <div id="modal-confirm" class="modal-overlay hidden">
     <div class="modal-box" style="text-align: center;">
       <h3 id="modal-title">¿Estás seguro?</h3>
@@ -488,31 +564,33 @@
     let detectedColorTitle = "#38bdf8";
     let detectedColorVol = "#fef08a";
 
-    // DEFAULT INITIAL FRAMES PRECARGADOS SI LA BD ESTÁ VACÍA
     const DEFAULT_REPOSITORY = [
       { id: "def_navidad", titulo: "Navidad Clásica", categoria: "navidad", url: "https://firebasestorage.googleapis.com/v0/b/losmayorgatv.firebasestorage.app/o/Incorporadas%20en%20App%20TV%2FNavidad.png?alt=media&token=68541b34-fb3b-4066-bf57-d944a3c2397f" },
       { id: "def_pascuas", titulo: "Pascuas Festivas", categoria: "pascuas", url: "https://firebasestorage.googleapis.com/v0/b/losmayorgatv.firebasestorage.app/o/Incorporadas%20en%20App%20TV%2FPascuas.png?alt=media&token=4d0802fd-7109-49f4-904f-adee5206f8cf" }
     ];
 
-    // RECORRIDO GUIADO
+    function openInfoModal() { document.getElementById("modal-info").classList.remove("hidden"); }
+    function closeInfoModal() { document.getElementById("modal-info").classList.add("hidden"); }
+
+    // RECORRIDO SPOTLIGHT CON ILUMINACIÓN Y POSICIONAMIENTO PERFECTO
     let currentTourStep = 0;
     const tourSteps = [
-      { targetId: "tour-step-frames", title: "🖼️ Repositorio de Marcos Temáticos", content: "Elige marcos precargados por evento (Navidad, Pascuas, Día de la Madre, Copa América...) o sube nuevos diseños PNG a la galería." },
-      { targetId: "tour-step-badges", title: "🔥 Insignias y Movimiento con Mouse", content: "Activa Oferta o Nuevo Ingreso y **mueve la insignia libremente en la vista previa**." },
-      { targetId: "tour-step-form", title: "📝 Formulario de Carga", content: "Carga productos. Si la foto ya viene editada, deja el Título vacío para respetar la imagen." },
-      { targetId: "tour-step-preview", title: "📺 Previsualización en Vivo", content: "Acomoda los elementos exactamente como quieres que salgan en las Smart TV." },
+      { targetId: "tour-step-frames", title: "🖼️ Repositorio de Marcos", content: "Elige marcos precargados por evento (Navidad, Pascuas, Día de la Madre, Copa América...) o sube nuevos diseños PNG a la galería." },
+      { targetId: "tour-step-badges", title: "🔥 Insignias y Movimiento", content: "Activa Oferta o Nuevo Ingreso y **mueve la insignia libremente con el mouse en la vista previa**." },
+      { targetId: "tour-step-form", title: "📝 Formulario de Carga", content: "Carga productos. Si la foto ya viene prediseñada de origen, deja el Título vacío." },
+      { targetId: "tour-step-preview", title: "📺 Previsualización en Vivo", content: "Acomoda los elementos exactamente como quieres que salgan proyectados en las TV." },
       { targetId: "tour-step-list", title: "📊 Reordenamiento y Seguridad", content: "Reordena las ofertas arrastrando ☰. Todo cambio requiere **Doble Reconfirmación**." }
     ];
 
     function startGuidedTour(step = 0) {
       currentTourStep = step;
-      document.getElementById("tour-backdrop").classList.remove("hidden");
       document.getElementById("tour-popover").classList.remove("hidden");
       renderTourStep();
     }
 
     function renderTourStep() {
       document.querySelectorAll(".tour-spotlight-highlight").forEach(el => el.classList.remove("tour-spotlight-highlight"));
+
       const stepData = tourSteps[currentTourStep];
       const targetEl = document.getElementById(stepData.targetId);
 
@@ -523,16 +601,17 @@
         setTimeout(() => {
           const rect = targetEl.getBoundingClientRect();
           const popover = document.getElementById("tour-popover");
+          
           let topPos = rect.bottom + 15;
-          let leftPos = rect.left + (rect.width / 2) - 225;
+          let leftPos = rect.left + (rect.width / 2) - 210;
 
           if (topPos + 220 > window.innerHeight) topPos = Math.max(20, rect.top - 230);
           if (leftPos < 20) leftPos = 20;
-          if (leftPos + 450 > window.innerWidth) leftPos = window.innerWidth - 470;
+          if (leftPos + 420 > window.innerWidth) leftPos = window.innerWidth - 440;
 
           popover.style.top = `${topPos}px`;
           popover.style.left = `${leftPos}px`;
-        }, 200);
+        }, 300);
       }
 
       document.getElementById("tour-step-badge").textContent = `Paso ${currentTourStep + 1} de ${tourSteps.length}`;
@@ -552,11 +631,9 @@
 
     function closeTourModal() {
       document.querySelectorAll(".tour-spotlight-highlight").forEach(el => el.classList.remove("tour-spotlight-highlight"));
-      document.getElementById("tour-backdrop").classList.add("hidden");
       document.getElementById("tour-popover").classList.add("hidden");
     }
 
-    // ARRASTRAR CON MOUSE EN PREVIEW
     function initDragAndDropBadge() {
       const previewContainer = document.getElementById("preview-box-container");
       const badges = [document.getElementById("prev-badge-oferta"), document.getElementById("prev-badge-nuevo")];
@@ -580,7 +657,6 @@
       });
     }
 
-    // GESTIÓN DEL REPOSICIONAMIENTO Y GALERÍA DE MARCOS
     db.collection("configuracion").doc("marcos").onSnapshot(doc => {
       if (doc.exists) {
         const data = doc.data();
@@ -600,7 +676,6 @@
       snapshot.forEach(doc => repoMarcosList.push({ id: doc.id, ...doc.data() }));
 
       if (repoMarcosList.length === 0) {
-        // Inicializar por defecto la primera vez
         DEFAULT_REPOSITORY.forEach(def => db.collection("galeria_marcos").doc(def.id).set(def));
       } else {
         renderGallery();
