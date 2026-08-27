@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Vidriera Digital - Los Mayorga TV</title>
 
-  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Roboto+Condensed:wght@700;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700;900&family=Roboto+Condensed:wght@700;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
 
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -19,6 +19,39 @@
     .slide.active { display: block; z-index: 10; }
     .bg-image { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; }
     
+    /* BADGE OFERTA 3D EN SMART TV */
+    .badge-oferta-3d {
+      position: absolute;
+      top: 6vh;
+      left: 10vw;
+      z-index: 10;
+      background: linear-gradient(180deg, #ffe600 0%, #ff8800 50%, #d90000 100%);
+      color: #fff;
+      font-weight: 900;
+      font-size: 3.5vw;
+      padding: 0.2vw 1.2vw;
+      border-radius: 0.6vw;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      border: 0.3vw solid #fff;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.8), inset 0 3px 3px rgba(255,255,255,0.7);
+      text-shadow: 3px 3px 0px #700000;
+      display: flex;
+      align-items: center;
+      gap: 0.8vw;
+      transform: rotate(-3deg);
+    }
+
+    .fire-icon {
+      display: inline-block;
+      animation: flameAnim 0.8s infinite alternate ease-in-out;
+    }
+
+    @keyframes flameAnim {
+      0% { transform: scale(1) rotate(-5deg); filter: drop-shadow(0 0 4px #ff3300); }
+      100% { transform: scale(1.3) rotate(5deg); filter: drop-shadow(0 0 12px #ffff00); }
+    }
+
     .overlay-content { 
       position: absolute; 
       top: 0; 
@@ -159,10 +192,17 @@
         const colorVol = prod.colorVolumen || "#fef08a";
 
         const bgMedia = prod.tipoMedia === "video" 
-          ? `<video src="${prod.imagenUrl}" class="bg-image" autoplay loop muted playsinline></video>`
-          : `<img src="${prod.imagenUrl}" class="bg-image">`;
+          ? `<video src="${prod.imagenUrl}" class="bg-image" autoplay loop muted playsinline crossorigin="anonymous"></video>`
+          : `<img src="${prod.imagenUrl}" class="bg-image" crossorigin="anonymous">`;
+
+        const badgeOfertaHTML = prod.showOfertaBadge === true
+          ? `<div class="badge-oferta-3d animate__animated animate__jackInTheBox animate__delay-1s">
+               <span>¡OFERTA!</span><span class="fire-icon">🔥</span>
+             </div>`
+          : '';
 
         slide.innerHTML = `
+          ${badgeOfertaHTML}
           ${bgMedia}
           <div class="overlay-content">
             <div class="title-main animate__animated animate__bounceInLeft animate__delay-1s" style="color: ${colorTitle}">${prod.titulo}</div>
