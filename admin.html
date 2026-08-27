@@ -93,6 +93,32 @@
     .btn-tour { background: #0284c7; color: #fff; font-size: 12px; padding: 8px 12px; }
     .btn-logout { background: #475569; color: #fff; font-size: 12px; padding: 8px 12px; }
 
+    /* DASHBOARD MARCOS TEMPORALES */
+    .theme-frame-panel {
+      background: #0f172a;
+      padding: 15px;
+      border-radius: 10px;
+      border: 1px solid #38bdf8;
+      margin-bottom: 20px;
+    }
+
+    .theme-frame-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+      margin-top: 10px;
+    }
+
+    .theme-card {
+      background: #1e293b;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid #334155;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
     .metrics-panel {
       display: grid; grid-template-columns: 1fr 1fr; gap: 15px; background: #0f172a; padding: 15px; border-radius: 8px; border: 1px solid #334155; margin-bottom: 15px;
     }
@@ -110,11 +136,27 @@
     .preview-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; display: none; }
     .preview-placeholder { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; color: #64748b; font-size: 14px; z-index: 1; text-align: center; padding: 20px; }
 
-    .badge-oferta-3d, .badge-nuevo-3d {
-      position: absolute; top: 18%; left: 10%; z-index: 10; color: #fff; font-weight: 900; font-size: 0.65rem; padding: 1px 7px; border-radius: 4px; text-transform: uppercase; border: 1px solid #fff; box-shadow: 0 2px 6px rgba(0,0,0,0.8); display: flex; align-items: center; gap: 3px; transform: rotate(-3deg);
+    /* IMÁGENES OFICIALES DE INSIGNIAS */
+    .badge-img-preview {
+      position: absolute;
+      top: 18%;
+      left: 10%;
+      z-index: 10;
+      width: 22%;
+      height: auto;
+      object-fit: contain;
+      filter: drop-shadow(0 4px 8px rgba(0,0,0,0.8));
     }
-    .badge-oferta-3d { background: linear-gradient(180deg, #ffe600 0%, #ff8800 50%, #d90000 100%); }
-    .badge-nuevo-3d { background: linear-gradient(180deg, #38bdf8 0%, #0284c7 50%, #1e3a8a 100%); }
+
+    /* MARCO TEMÁTICO EN PREVISUALIZACIÓN */
+    .preview-frame-overlay {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      object-fit: fill;
+      z-index: 12;
+      pointer-events: none;
+    }
 
     .preview-legal-banner {
       position: absolute; bottom: 8%; left: 10%; z-index: 10; background: #dc2626; color: #ffffff; font-family: system-ui, sans-serif; font-size: 0.55rem; font-weight: 800; padding: 3px 8px; border-radius: 3px; box-shadow: 0 2px 8px rgba(0,0,0,0.8); max-width: 42%; line-height: 1.1; text-transform: uppercase;
@@ -181,8 +223,38 @@
 
   <div class="container">
     
+    <!-- SECCIÓN GLOBAL: MARCOS TEMÁTICOS (NAVIDAD / PASCUAS) -->
+    <div class="card theme-frame-panel">
+      <h2 style="color: #fef08a;">🎄 Marcos Temáticos Temporales (Decoración Global Smart TV)</h2>
+      <p style="font-size: 12px; color: #94a3b8; margin-top: 4px;">Al activar un marco, se superpondrá sobre todas las imágenes promocionales que tengan título cargado.</p>
+      
+      <div class="theme-frame-grid">
+        <div class="theme-card">
+          <div>
+            <strong style="color:#fff; font-size: 14px;">Navidad / Año Nuevo 🎄</strong>
+            <div id="status-frame-navidad" class="status-pill inactive" style="margin-top:4px;">DESACTIVADO</div>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="toggle-frame-navidad" onchange="toggleGlobalThemeFrame('navidad')">
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <div class="theme-card">
+          <div>
+            <strong style="color:#fff; font-size: 14px;">Pascuas 🐰</strong>
+            <div id="status-frame-pascuas" class="status-pill inactive" style="margin-top:4px;">DESACTIVADO</div>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="toggle-frame-pascuas" onchange="toggleGlobalThemeFrame('pascuas')">
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+    </div>
+
     <div class="admin-grid">
-      <!-- FORMULARIO -->
+      <!-- FORMULARIO DE CARGA -->
       <div class="card">
         <div class="header-bar">
           <h2 id="form-header-title">Cargar Nueva Oferta</h2>
@@ -230,7 +302,7 @@
           <div class="row">
             <div class="form-group">
               <label>Título (ej. CERVEZA)</label>
-              <input type="text" id="prod-title" required placeholder="CERVEZA" oninput="updatePreviewText()">
+              <input type="text" id="prod-title" placeholder="CERVEZA (Dejar vacío si la foto ya viene editada)" oninput="updatePreviewText()">
             </div>
             <div class="form-group">
               <label>Subtítulo (ej. CLÁSICA EN LATA)</label>
@@ -274,12 +346,12 @@
         <p style="font-size: 13px; color: #94a3b8; margin-bottom: 15px;">Así se proyectará exactamente en las TV.</p>
         
         <div class="preview-container">
-          <div id="prev-badge-oferta" class="badge-oferta-3d animate__animated animate__zoomIn hidden">
-            <span>¡OFERTA!</span><span>🔥</span>
-          </div>
-          <div id="prev-badge-nuevo" class="badge-nuevo-3d animate__animated animate__zoomIn hidden">
-            <span>¡NUEVO INGRESO!</span><span>✨</span>
-          </div>
+          <!-- IMÁGENES OFICIALES DE BADGES PNG -->
+          <img id="prev-badge-oferta" class="badge-img-preview animate__animated animate__zoomIn hidden" src="https://firebasestorage.googleapis.com/v0/b/losmayorgatv.firebasestorage.app/o/Incorporadas%20en%20App%20TV%2FOferta.png?alt=media&token=92984e5a-de83-4086-ab5e-76c85ab558d5">
+          <img id="prev-badge-nuevo" class="badge-img-preview animate__animated animate__zoomIn hidden" src="https://firebasestorage.googleapis.com/v0/b/losmayorgatv.firebasestorage.app/o/Incorporadas%20en%20App%20TV%2FNuevo%20Ingreso.png?alt=media&token=b1645d33-9076-46ed-a076-059d58b05b1f">
+
+          <!-- MARCO TEMÁTICO EN PREVISUALIZACIÓN -->
+          <img id="prev-theme-frame" class="preview-frame-overlay hidden" src="">
 
           <div id="prev-placeholder" class="preview-placeholder">Selecciona un archivo para previsualizar</div>
           <img id="prev-bg" class="preview-bg" crossorigin="anonymous">
@@ -333,16 +405,15 @@
     </div>
   </div>
 
-  <!-- MODAL DE GUÍA Y RECOMENDACIONES (ACCESIBLE DESDE EL BOTÓN GUÍA TV) -->
+  <!-- MODAL DE GUÍA Y RECOMENDACIONES -->
   <div id="tour-modal" class="modal-overlay hidden">
     <div class="modal-box" style="text-align: left;">
       <h3>📘 Guía Técnica y Recomendaciones</h3>
       <ul>
-        <li><strong>Resolución de Imágenes:</strong> Utilizar diseños horizontales en formato 16:9, idealmente <strong>1280 × 720 px</strong> o <strong>1920 × 1080 px</strong> (Full HD).</li>
-        <li><strong>Formatos Soportados:</strong> Imágenes <code>JPG</code> o <code>PNG</code> de alta calidad. Videos cortos animados en formato <code>MP4</code>.</li>
-        <li><strong>Cantidad de Ofertas:</strong> Se recomienda mantener entre <strong>8 y 12 placas activas</strong> en simultáneo para lograr un ciclo dinámico sin saturar al cliente en caja.</li>
-        <li><strong>Tiempos de Rotación:</strong> Cada placa se muestra automáticamente durante 7 segundos con transiciones suaves en fundido (*Crossfade*).</li>
-        <li><strong>Insignias:</strong> Utiliza el interruptor <em>OFERTA 🔥</em> o <em>NUEVO INGRESO ✨</em> para destacar visualmente el producto.</li>
+        <li><strong>Resolución de Imágenes:</strong> Utilizar diseños horizontales en formato 16:9 (<strong>1280 × 720 px</strong> o <strong>1920 × 1080 px</strong>).</li>
+        <li><strong>Imágenes Editadas de Origen:</strong> Si subes un diseño listo que ya contiene el texto impreso, **deja el campo Título vacío**. Así el sistema ocultará los textos superpuestos y el marco temático.</li>
+        <li><strong>Formatos Soportados:</strong> Imágenes <code>JPG</code> o <code>PNG</code>. Videos cortos en <code>MP4</code>.</li>
+        <li><strong>Marcos Temáticos (Navidad / Pascuas):</strong> Se activan desde la sección superior y afectan a todas las TV en tiempo real.</li>
       </ul>
       <button class="btn-primary" onclick="closeTourModal()">Entendido, Cerrar Guía</button>
     </div>
@@ -381,16 +452,16 @@
       window.location.href = "login.html";
     }
 
-    function openTourModal() {
-      document.getElementById("tour-modal").classList.remove("hidden");
-    }
-
-    function closeTourModal() {
-      document.getElementById("tour-modal").classList.add("hidden");
-    }
+    function openTourModal() { document.getElementById("tour-modal").classList.remove("hidden"); }
+    function closeTourModal() { document.getElementById("tour-modal").classList.add("hidden"); }
 
     const CLOUDINARY_CLOUD_NAME = "aibqthzz"; 
     const CLOUDINARY_PRESET = "losmayorgatv";
+
+    const FRAME_URLS = {
+      navidad: "https://firebasestorage.googleapis.com/v0/b/losmayorgatv.firebasestorage.app/o/Incorporadas%20en%20App%20TV%2FNavidad.png?alt=media&token=68541b34-fb3b-4066-bf57-d944a3c2397f",
+      pascuas: "https://firebasestorage.googleapis.com/v0/b/losmayorgatv.firebasestorage.app/o/Incorporadas%20en%20App%20TV%2FPascuas.png?alt=media&token=4d0802fd-7109-49f4-904f-adee5206f8cf"
+    };
 
     const firebaseConfig = {
       apiKey: "AIzaSyAhTFpjaWhAUnA3P5_pXGNgjAUlKEtDXAA",
@@ -410,12 +481,64 @@
     let editingProductId = null;
     let currentExistingImageUrl = "";
     let currentExistingMediaType = "image";
+    let activeGlobalFrame = "none";
     
     let detectedColorTitle = "#38bdf8";
     let detectedColorVol = "#fef08a";
 
     const sortableList = document.getElementById('product-list');
     new Sortable(sortableList, { handle: '.drag-handle', animation: 150 });
+
+    // ESCUCHAR CONFIGURACIÓN GLOBAL DE MARCOS
+    db.collection("configuracion").doc("marcos").onSnapshot(doc => {
+      if (doc.exists) {
+        const data = doc.data();
+        activeGlobalFrame = data.activeFrame || "none";
+      } else {
+        activeGlobalFrame = "none";
+      }
+      updateThemeFrameUI();
+    });
+
+    function toggleGlobalThemeFrame(type) {
+      let nextFrame = "none";
+      if (type === 'navidad' && document.getElementById("toggle-frame-navidad").checked) nextFrame = "navidad";
+      if (type === 'pascuas' && document.getElementById("toggle-frame-pascuas").checked) nextFrame = "pascuas";
+
+      db.collection("configuracion").doc("marcos").set({ activeFrame: nextFrame });
+    }
+
+    function updateThemeFrameUI() {
+      const isNavidad = activeGlobalFrame === "navidad";
+      const isPascuas = activeGlobalFrame === "pascuas";
+
+      document.getElementById("toggle-frame-navidad").checked = isNavidad;
+      document.getElementById("toggle-frame-pascuas").checked = isPascuas;
+
+      const statusNav = document.getElementById("status-frame-navidad");
+      const statusPas = document.getElementById("status-frame-pascuas");
+
+      statusNav.textContent = isNavidad ? "ACTIVADO EN TV" : "DESACTIVADO";
+      statusNav.className = "status-pill " + (isNavidad ? "active" : "inactive");
+
+      statusPas.textContent = isPascuas ? "ACTIVADO EN TV" : "DESACTIVADO";
+      statusPas.className = "status-pill " + (isPascuas ? "active" : "inactive");
+
+      updatePreviewFrame();
+    }
+
+    function updatePreviewFrame() {
+      const frameImg = document.getElementById("prev-theme-frame");
+      const currentTitle = document.getElementById("prod-title").value.trim();
+
+      // SOLO SE APLICA EL MARCO SI LA PLACA TIENE TÍTULO
+      if (activeGlobalFrame !== "none" && FRAME_URLS[activeGlobalFrame] && currentTitle !== "") {
+        frameImg.src = FRAME_URLS[activeGlobalFrame];
+        frameImg.classList.remove("hidden");
+      } else {
+        frameImg.classList.add("hidden");
+      }
+    }
 
     function handleBadgeToggle(type) {
       const isOferta = document.getElementById("prod-show-oferta");
@@ -473,6 +596,7 @@
       document.getElementById("prev-pack").textContent = (document.getElementById("prod-pack").value || "PRESENTACIÓN").toUpperCase();
       document.getElementById("prev-price-int").textContent = document.getElementById("prod-price-int").value || "0.000";
       document.getElementById("prev-price-dec").textContent = document.getElementById("prod-price-dec").value || "00";
+      updatePreviewFrame();
     }
 
     function setPreviewColors(colorTitle, colorVol) {
@@ -603,7 +727,7 @@
           <div class="product-info">
             ${thumbMedia}
             <div class="product-details">
-              <h4>${p.titulo} - $${p.precioEntero} ${badgeTag} ${isVideo ? '📹' : ''}</h4>
+              <h4>${p.titulo || 'IMAGEN EDITADA'} - $${p.precioEntero} ${badgeTag} ${isVideo ? '📹' : ''}</h4>
               <p>${p.subtitulo || ''}</p>
             </div>
           </div>
@@ -775,13 +899,15 @@
           finalImageUrl = isVideo ? data.secure_url : data.secure_url.replace('/upload/', '/upload/w_1280,f_auto,q_auto/');
         }
 
+        const rawTitle = document.getElementById("prod-title").value.trim();
+
         const payload = {
           imagenUrl: finalImageUrl,
           tipoMedia: detectedType,
           showOfertaBadge: document.getElementById("prod-show-oferta").checked,
           showNuevoBadge: document.getElementById("prod-show-nuevo").checked,
           fechaFinOferta: document.getElementById("prod-oferta-end-date").value || null,
-          titulo: document.getElementById("prod-title").value.toUpperCase(),
+          titulo: rawTitle ? rawTitle.toUpperCase() : "",
           subtitulo: document.getElementById("prod-sub").value.toUpperCase(),
           volumen: document.getElementById("prod-vol").value.toUpperCase(),
           presentacion: document.getElementById("prod-pack").value.toUpperCase(),
@@ -810,7 +936,7 @@
       }
     }
 
-    // ANIMACIÓN CANVAS PARTÍCULAS EN ADMIN
+    // ANIMACIÓN CANVAS PARTÍCULAS
     const canvas = document.getElementById('futuristic-bg');
     const ctx = canvas.getContext('2d');
     let particles = [];
