@@ -32,11 +32,11 @@
 
     .bg-image { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; }
     
-    /* IMÁGENES OFICIALES DE BADGES PNG */
+    /* INSIGNIAS REUBICADAS MÁS ARRIBA (5vh DESDE ARRIBA) */
     .badge-img-tv {
       position: absolute;
-      top: 18vh; left: 10vw; z-index: 10;
-      width: 22vw; height: auto;
+      top: 5vh; left: 8vw; z-index: 10;
+      width: 20vw; height: auto;
       object-fit: contain;
       filter: drop-shadow(0 8px 16px rgba(0,0,0,0.8));
     }
@@ -96,9 +96,10 @@
     const BADGE_OFERTA_URL = "https://firebasestorage.googleapis.com/v0/b/losmayorgatv.firebasestorage.app/o/Incorporadas%20en%20App%20TV%2FOferta.png?alt=media&token=92984e5a-de83-4086-ab5e-76c85ab558d5";
     const BADGE_NUEVO_URL = "https://firebasestorage.googleapis.com/v0/b/losmayorgatv.firebasestorage.app/o/Incorporadas%20en%20App%20TV%2FNuevo%20Ingreso.png?alt=media&token=b1645d33-9076-46ed-a076-059d58b05b1f";
 
-    const FRAME_URLS = {
+    let FRAME_URLS = {
       navidad: "https://firebasestorage.googleapis.com/v0/b/losmayorgatv.firebasestorage.app/o/Incorporadas%20en%20App%20TV%2FNavidad.png?alt=media&token=68541b34-fb3b-4066-bf57-d944a3c2397f",
-      pascuas: "https://firebasestorage.googleapis.com/v0/b/losmayorgatv.firebasestorage.app/o/Incorporadas%20en%20App%20TV%2FPascuas.png?alt=media&token=4d0802fd-7109-49f4-904f-adee5206f8cf"
+      pascuas: "https://firebasestorage.googleapis.com/v0/b/losmayorgatv.firebasestorage.app/o/Incorporadas%20en%20App%20TV%2FPascuas.png?alt=media&token=4d0802fd-7109-49f4-904f-adee5206f8cf",
+      generico: ""
     };
 
     firebase.initializeApp(firebaseConfig);
@@ -111,17 +112,17 @@
     let currentIndex = 0;
     let stepTimeout = null;
 
-    // ESCUCHAR CONFIGURACIÓN DE MARCOS GLOBAL
     db.collection("configuracion").doc("marcos").onSnapshot(doc => {
       if (doc.exists) {
-        activeGlobalFrame = doc.data().activeFrame || "none";
+        const data = doc.data();
+        activeGlobalFrame = data.activeFrame || "none";
+        if (data.urls) FRAME_URLS = { ...FRAME_URLS, ...data.urls };
       } else {
         activeGlobalFrame = "none";
       }
       updateDOMSlides();
     });
 
-    // ESCUCHAR PRODUCTOS EN FIREBASE
     db.collection("productos").onSnapshot(snapshot => {
       const now = new Date();
       const rawData = [];
@@ -174,7 +175,6 @@
           badgeHTML = `<img class="badge-img-tv animate__animated animate__zoomIn animate__delay-1s" src="${BADGE_NUEVO_URL}">`;
         }
 
-        // MARCO TEMÁTICO: SOLO SI TIENE TÍTULO CARGADO
         let themeFrameHTML = "";
         const hasTitle = prod.titulo && prod.titulo.trim() !== "";
         if (hasTitle && activeGlobalFrame !== "none" && FRAME_URLS[activeGlobalFrame]) {
