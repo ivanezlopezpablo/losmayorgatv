@@ -69,7 +69,6 @@
     .btn-danger { background: #dc2626; color: #fff; font-size: 13px; padding: 6px 12px; }
     .btn-logout { background: #475569; color: #fff; font-size: 13px; padding: 8px 14px; }
 
-    /* DASHBOARD DE MÉTRICAS Y MARKETING */
     .metrics-panel {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -94,7 +93,6 @@
       margin-bottom: 15px;
     }
 
-    /* PREVISUALIZACIÓN VISTA PREVIA */
     .preview-container {
       position: relative;
       width: 100%;
@@ -131,10 +129,10 @@
       padding: 20px;
     }
 
-    /* BADGES EN PREVISUALIZACIÓN */
+    /* BADGES REUBICADOS EN EL RECUADRO INDICADO (top: 18%) */
     .badge-oferta-3d {
       position: absolute;
-      top: 4%;
+      top: 18%;
       left: 10%;
       z-index: 10;
       background: linear-gradient(180deg, #ffe600 0%, #ff8800 50%, #d90000 100%);
@@ -154,7 +152,7 @@
 
     .badge-nuevo-3d {
       position: absolute;
-      top: 4%;
+      top: 18%;
       left: 10%;
       z-index: 10;
       background: linear-gradient(180deg, #38bdf8 0%, #0284c7 50%, #1e3a8a 100%);
@@ -258,7 +256,6 @@
 
     .preview-price .cents { font-size: 0.8rem; text-decoration: underline; margin-left: 2px; }
 
-    /* LISTA CON NÚMERO DE ORDEN Y 3 RAYITAS DE ARRASTRE */
     .product-list { list-style: none; }
     .product-item {
       background: #334155;
@@ -325,7 +322,7 @@
   <div class="container">
     
     <div class="admin-grid">
-      <!-- FORMULARIO DE CARGA -->
+      <!-- FORMULARIO -->
       <div class="card">
         <div class="header-bar">
           <h2 id="form-header-title">Cargar Nueva Oferta</h2>
@@ -453,7 +450,6 @@
         <button class="btn-save-order" onclick="requestSaveOrder()">Guardar Nuevo Orden</button>
       </div>
 
-      <!-- METRICAS DE TIEMPO Y CANTIDAD DE IMÁGENES -->
       <div class="metrics-panel">
         <div class="metric-card">
           <div id="metric-total-slides" class="metric-value">0</div>
@@ -465,7 +461,6 @@
         </div>
       </div>
 
-      <!-- TIP DE MARKETING ESTRATÉGICO -->
       <div id="marketing-tip-box" class="marketing-tip">
         💡 <strong>Cargando análisis de marketing...</strong>
       </div>
