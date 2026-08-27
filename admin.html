@@ -37,14 +37,17 @@
     .btn-primary { background: #0284c7; color: #fff; width: 100%; padding: 12px; font-size: 16px; margin-top: 10px; }
     .btn-primary:hover { background: #0369a1; }
     .btn-save-order { background: #16a34a; color: #fff; margin-bottom: 15px; }
-    .btn-danger { background: #dc2626; color: #fff; }
+    .btn-edit { background: #eab308; color: #0f172a; font-size: 13px; padding: 6px 12px; }
+    .btn-edit:hover { background: #ca8a04; }
+    .btn-cancel-edit { background: #64748b; color: #fff; width: 100%; padding: 10px; font-size: 14px; margin-top: 8px; }
+    .btn-danger { background: #dc2626; color: #fff; font-size: 13px; padding: 6px 12px; }
     .btn-logout { background: #475569; color: #fff; font-size: 13px; padding: 8px 14px; }
 
     /* ESTILOS DE LA PREVISUALIZACIÓN EN VIVO (Simulador de TV 16:9) */
     .preview-container {
       position: relative;
       width: 100%;
-      padding-top: 56.25%; /* Relación de aspecto 16:9 */
+      padding-top: 56.25%;
       background: #000;
       border-radius: 8px;
       overflow: hidden;
@@ -161,6 +164,7 @@
     .product-thumb { width: 60px; height: 60px; object-fit: cover; border-radius: 6px; background: #0f172a; }
     .product-details h4 { font-size: 16px; color: #fff; }
     .product-details p { font-size: 13px; color: #94a3b8; }
+    .action-buttons { display: flex; align-items: center; gap: 10px; }
 
     .switch { position: relative; display: inline-block; width: 50px; height: 26px; flex-shrink: 0; }
     .switch input { opacity: 0; width: 0; height: 0; }
@@ -189,14 +193,14 @@
       <!-- COLUMNA 1: FORMULARIO -->
       <div class="card">
         <div class="header-bar">
-          <h2>Cargar Nueva Oferta</h2>
+          <h2 id="form-header-title">Cargar Nueva Oferta</h2>
           <button class="btn-logout" onclick="logout()">Cerrar Sesión</button>
         </div>
 
         <form id="product-form">
           <div class="form-group">
-            <label>Imagen del Producto</label>
-            <input type="file" id="prod-img" accept="image/*" required onchange="updatePreviewImg(this)">
+            <label id="img-label">Imagen del Producto</label>
+            <input type="file" id="prod-img" accept="image/*" onchange="updatePreviewImg(this)">
           </div>
           <div class="row">
             <div class="form-group">
@@ -232,7 +236,9 @@
             <label>Programar Publicación (Opcional)</label>
             <input type="datetime-local" id="prod-date">
           </div>
-          <button type="button" class="btn-primary" onclick="requestUpload()">Publicar Oferta</button>
+          
+          <button type="button" id="btn-submit" class="btn-primary" onclick="requestUpload()">Publicar Oferta</button>
+          <button type="button" id="btn-cancel" class="btn-cancel-edit hidden" onclick="cancelEditing()">Cancelar Edición</button>
         </form>
         <div id="status" class="hidden"></div>
       </div>
@@ -305,7 +311,7 @@
       window.location.href = "login.html";
     }
 
-    // DATOS CONFIGURADOS DE CLOUDINARY Y FIREBASE
+    // CLOUDINARY Y FIREBASE
     const CLOUDINARY_CLOUD_NAME = "aibqthzz"; 
     const CLOUDINARY_PRESET = "losmayorgatv";
 
@@ -324,11 +330,13 @@
 
     let productosList = [];
     let pendingAction = null;
+    let editingProductId = null; // ID del producto en edición
+    let currentExistingImageUrl = ""; // Guarda la URL de imagen actual si no se sube una nueva
 
     const sortableList = document.getElementById('product-list');
     new Sortable(sortableList, { animation: 150 });
 
-    // FUNCIONES DE PREVISUALIZACIÓN EN VIVO
+    // PREVISUALIZACIÓN EN VIVO
     function updatePreviewText() {
       document.getElementById("prev-title").textContent = (document.getElementById("prod-title").value || "TÍTULO").toUpperCase();
       document.getElementById("prev-sub").textContent = (document.getElementById("prod-sub").value || "SUBTÍTULO").toUpperCase();
@@ -386,15 +394,68 @@
             </div>
           </div>
           
-          <label class="switch" title="Activar/Desactivar">
-            <input type="checkbox" ${p.activo !== false ? 'checked' : ''} onchange="requestToggleActive('${p.id}', this.checked)">
-            <span class="slider"></span>
-          </label>
-
-          <button class="btn-danger" onclick="requestDelete('${p.id}')">Eliminar</button>
+          <div class="action-buttons">
+            <label class="switch" title="Activar/Desactivar">
+              <input type="checkbox" ${p.activo !== false ? 'checked' : ''} onchange="requestToggleActive('${p.id}', this.checked)">
+              <span class="slider"></span>
+            </label>
+            
+            <button class="btn-edit" onclick="startEditing('${p.id}')">Editar</button>
+            <button class="btn-danger" onclick="requestDelete('${p.id}')">Eliminar</button>
+          </div>
         `;
         sortableList.appendChild(li);
       });
+    }
+
+    // MODALIDAD EDICIÓN DE OFERTAS
+    function startEditing(id) {
+      const prod = productosList.find(p => p.id === id);
+      if (!prod) return;
+
+      editingProductId = id;
+      currentExistingImageUrl = prod.imagenUrl;
+
+      // Cargar formulario
+      document.getElementById("prod-title").value = prod.titulo || "";
+      document.getElementById("prod-sub").value = prod.subtitulo || "";
+      document.getElementById("prod-vol").value = prod.volumen || "";
+      document.getElementById("prod-pack").value = prod.presentacion || "";
+      document.getElementById("prod-price-int").value = prod.precioEntero || "";
+      document.getElementById("prod-price-dec").value = prod.precioDecimal || "00";
+      document.getElementById("prod-date").value = prod.fechaProgramada || "";
+
+      // Ajustes interfaz
+      document.getElementById("form-header-title").textContent = "Editar Oferta Existent";
+      document.getElementById("img-label").textContent = "Cambiar Imagen (Opcional - Dejar vacío para conservar la actual)";
+      document.getElementById("btn-submit").textContent = "Guardar Cambios";
+      document.getElementById("btn-cancel").classList.remove("hidden");
+
+      // Cargar imagen en vista previa
+      const bg = document.getElementById("prev-bg");
+      bg.src = prod.imagenUrl;
+      bg.style.display = "block";
+      document.getElementById("prev-placeholder").style.display = "none";
+
+      updatePreviewText();
+
+      // Desplazarse arriba suavemente
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function cancelEditing() {
+      editingProductId = null;
+      currentExistingImageUrl = "";
+
+      document.getElementById("product-form").reset();
+      document.getElementById("form-header-title").textContent = "Cargar Nueva Oferta";
+      document.getElementById("img-label").textContent = "Imagen del Producto";
+      document.getElementById("btn-submit").textContent = "Publicar Oferta";
+      document.getElementById("btn-cancel").classList.add("hidden");
+
+      document.getElementById("prev-bg").style.display = "none";
+      document.getElementById("prev-placeholder").style.display = "flex";
+      updatePreviewText();
     }
 
     function showStatus(msg, isError = false) {
@@ -428,8 +489,17 @@
     }
 
     function requestUpload() {
-      if (!document.getElementById("prod-img").files[0]) return alert("Selecciona una imagen");
-      openModal("¿Publicar Producto?", "La oferta se subirá y estará disponible en las pantallas.", processUpload);
+      const fileInput = document.getElementById("prod-img");
+      if (!editingProductId && !fileInput.files[0]) {
+        return alert("Selecciona una imagen para crear la oferta");
+      }
+
+      const actionText = editingProductId ? "¿Guardar Cambios?" : "¿Publicar Oferta?";
+      const msgText = editingProductId 
+        ? "Se actualizarán los datos de esta oferta en los televisores." 
+        : "La oferta se subirá y estará disponible en las pantallas.";
+
+      openModal(actionText, msgText, processUpload);
     }
 
     function requestSaveOrder() {
@@ -467,28 +537,30 @@
     }
 
     async function processUpload() {
-      showStatus("Subiendo imagen optimizada para TV...");
+      showStatus("Guardando datos en Firebase...");
       try {
-        const file = document.getElementById("prod-img").files[0];
-        
-        const formData = new FormData();
-        formData.append("file", file);
-        formData.append("upload_preset", CLOUDINARY_PRESET);
+        const fileInput = document.getElementById("prod-img");
+        let finalImageUrl = currentExistingImageUrl;
 
-        const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`, {
-          method: "POST",
-          body: formData
-        });
+        // Si se seleccionó una foto nueva, subirla a Cloudinary
+        if (fileInput.files && fileInput.files[0]) {
+          showStatus("Subiendo nueva imagen optimizada...");
+          const formData = new FormData();
+          formData.append("file", fileInput.files[0]);
+          formData.append("upload_preset", CLOUDINARY_PRESET);
 
-        if (!res.ok) throw new Error("Error al subir la imagen a Cloudinary");
-        const data = await res.json();
-        
-        const imageUrl = data.secure_url.replace('/upload/', '/upload/w_1280,f_auto,q_auto/');
+          const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`, {
+            method: "POST",
+            body: formData
+          });
 
-        await db.collection("productos").add({
-          activo: true,
-          orden: productosList.length,
-          imagenUrl: imageUrl,
+          if (!res.ok) throw new Error("Error al subir la imagen a Cloudinary");
+          const data = await res.json();
+          finalImageUrl = data.secure_url.replace('/upload/', '/upload/w_1280,f_auto,q_auto/');
+        }
+
+        const payload = {
+          imagenUrl: finalImageUrl,
           titulo: document.getElementById("prod-title").value.toUpperCase(),
           subtitulo: document.getElementById("prod-sub").value.toUpperCase(),
           volumen: document.getElementById("prod-vol").value.toUpperCase(),
@@ -496,17 +568,22 @@
           precioEntero: document.getElementById("prod-price-int").value,
           precioDecimal: document.getElementById("prod-price-dec").value || "00",
           fechaProgramada: document.getElementById("prod-date").value || null,
-          createdAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
+        };
 
-        document.getElementById("product-form").reset();
-        
-        // Resetear la vista previa a valores por defecto
-        document.getElementById("prev-bg").style.display = "none";
-        document.getElementById("prev-placeholder").style.display = "flex";
-        updatePreviewText();
+        if (editingProductId) {
+          // Actualización de producto existente
+          await db.collection("productos").doc(editingProductId).update(payload);
+          showStatus("¡Oferta actualizada exitosamente!");
+        } else {
+          // Creación de nuevo producto
+          payload.activo = true;
+          payload.orden = productosList.length;
+          payload.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+          await db.collection("productos").add(payload);
+          showStatus("¡Oferta publicada exitosamente!");
+        }
 
-        showStatus("¡Oferta publicada exitosamente!");
+        cancelEditing();
         closeModal();
       } catch (err) {
         showStatus("Error: " + err.message, true);
