@@ -1114,7 +1114,7 @@
       updateBadgeUI();
 
       document.getElementById("form-header-title").textContent = "Cargar Nueva Oferta";
-      document.getElementById("btn-submit").textContent = "Publicar Oferta";
+      document.getElementById("btn-submit").textContent = "Publicar em TV";
       document.getElementById("btn-cancel").classList.add("hidden");
 
       document.getElementById("prev-bg").style.display = "none";
@@ -1157,7 +1157,7 @@
     function requestUpload() {
       const fileInput = document.getElementById("prod-img");
       if (!editingProductId && !fileInput.files[0]) return alert("Selecciona un archivo");
-      openModal(editingProductId ? "¿Guardar Cambios?" : "¿Publicar Oferta?", "Se actualizarán las pantallas de las TV.", processUpload);
+      openModal(editingProductId ? "¿Guardar Cambios?" : "¿Publicar en TV?", "Se actualizarán las pantallas de las TV.", processUpload);
     }
 
     function requestSaveOrder() { openModal("¿Guardar Nuevo Orden?", "El nuevo orden cambiará en vivo.", processSaveOrder); }
