@@ -8,6 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700;900&family=Roboto+Condensed:wght@700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
 
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
@@ -129,7 +130,7 @@
       padding: 20px;
     }
 
-    /* BADGES REUBICADOS EN EL RECUADRO INDICADO (top: 18%) */
+    /* BADGES EN POSICIÓN Y CON ANIMACIÓN 3D */
     .badge-oferta-3d {
       position: absolute;
       top: 18%;
@@ -168,6 +169,16 @@
       align-items: center;
       gap: 3px;
       transform: rotate(-3deg);
+    }
+
+    .fire-icon {
+      display: inline-block;
+      animation: flameAnim 0.8s infinite alternate ease-in-out;
+    }
+
+    @keyframes flameAnim {
+      0% { transform: scale(1) rotate(-5deg); filter: drop-shadow(0 0 1px #ff3300); }
+      100% { transform: scale(1.2) rotate(5deg); filter: drop-shadow(0 0 5px #ffff00); }
     }
 
     .preview-legal-banner {
@@ -237,10 +248,11 @@
       text-shadow: 0 3px 10px rgba(0,0,0,0.95);
     }
 
+    /* PRECIO REUBICADO UN POCO MÁS A LA IZQUIERDA Y ABAJO CON ANIMACIÓN PULSATE */
     .preview-price {
       position: absolute;
-      bottom: 22%;
-      right: 6%;
+      bottom: 14%; /* Un poco más abajo */
+      right: 12%; /* Un poco más a la izquierda */
       z-index: 3;
       background-color: #fff;
       padding: 2px 10px;
@@ -412,10 +424,10 @@
         <p style="font-size: 13px; color: #94a3b8; margin-bottom: 15px;">Así se proyectará exactamente en las TV.</p>
         
         <div class="preview-container">
-          <div id="prev-badge-oferta" class="badge-oferta-3d hidden">
+          <div id="prev-badge-oferta" class="badge-oferta-3d animate__animated animate__zoomIn hidden">
             <span>¡OFERTA!</span><span>🔥</span>
           </div>
-          <div id="prev-badge-nuevo" class="badge-nuevo-3d hidden">
+          <div id="prev-badge-nuevo" class="badge-nuevo-3d animate__animated animate__zoomIn hidden">
             <span>¡NUEVO INGRESO!</span><span>✨</span>
           </div>
 
@@ -436,7 +448,7 @@
             OFERTA VÁLIDA HASTA AGOTAR STOCK
           </div>
           
-          <div class="preview-price">
+          <div class="preview-price animate__animated animate__pulse animate__infinite">
             $ <span id="prev-price-int">21.076</span><span id="prev-price-dec" class="cents">90</span>
           </div>
         </div>
