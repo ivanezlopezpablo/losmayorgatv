@@ -19,10 +19,10 @@
     .slide.active { display: block; z-index: 10; }
     .bg-image { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; }
     
-    /* BADGE OFERTA 3D EN SMART TV */
+    /* BADGE OFERTA 3D EN SMART TV (REUBICADO MÁS ABAJO) */
     .badge-oferta-3d {
       position: absolute;
-      top: 6vh;
+      top: 14vh; /* Bajado para no tapar los bordes superiores */
       left: 10vw;
       z-index: 10;
       background: linear-gradient(180deg, #ffe600 0%, #ff8800 50%, #d90000 100%);
@@ -71,14 +71,20 @@
       font-size: 8.5vw; 
       font-weight: 700; 
       line-height: 0.85; 
-      text-shadow: 3px 3px 15px rgba(0,0,0,0.8); 
+      text-shadow: 
+        0.3vw 0.3vw 0 #000, -0.3vw -0.3vw 0 #000, 0.3vw -0.3vw 0 #000, -0.3vw 0.3vw 0 #000,
+        0 0.5vw 2vw rgba(0,0,0,0.9); 
     }
     
+    /* SUBTÍTULO Y PRESENTACIÓN: BLANCO PURO CON BORDE COMPUESTO */
     .subtitle { 
-      font-size: 2.2vw; 
-      color: #fff; 
-      margin-top: 5px; 
-      text-shadow: 2px 2px 8px rgba(0,0,0,0.8); 
+      font-size: 2.3vw; 
+      font-weight: 700;
+      color: #ffffff; 
+      margin-top: 8px; 
+      text-shadow: 
+        0.2vw 0.2vw 0 #000, -0.2vw -0.2vw 0 #000, 0.2vw -0.2vw 0 #000, -0.2vw 0.2vw 0 #000,
+        0 0 1.5vw rgba(0,0,0,0.95); 
     }
     
     .details-row { 
@@ -92,16 +98,20 @@
       font-size: 8vw; 
       font-weight: 700; 
       line-height: 0.8; 
-      text-shadow: 3px 3px 12px rgba(0,0,0,0.8); 
+      text-shadow: 
+        0.3vw 0.3vw 0 #000, -0.3vw -0.3vw 0 #000, 0.3vw -0.3vw 0 #000, -0.3vw 0.3vw 0 #000,
+        0 0.5vw 2vw rgba(0,0,0,0.9); 
     }
     
     .pack-info { 
       font-size: 3vw; 
       font-weight: 700; 
-      color: #fff; 
+      color: #ffffff; 
       line-height: 0.95; 
-      max-width: 14vw; 
-      text-shadow: 2px 2px 8px rgba(0,0,0,0.8); 
+      max-width: 15vw; 
+      text-shadow: 
+        0.2vw 0.2vw 0 #000, -0.2vw -0.2vw 0 #000, 0.2vw -0.2vw 0 #000, -0.2vw 0.2vw 0 #000,
+        0 0 1.5vw rgba(0,0,0,0.95); 
     }
     
     .price-override { 
@@ -160,6 +170,7 @@
     let stepTimeout = null;
     let transitionIndex = 0;
 
+    // ESCUCHA EN TIEMPO REAL (AUTO-RECURSIVO PARA REFLEJO INMEDIATO EN SMART TV)
     db.collection("productos").onSnapshot(snapshot => {
       const now = new Date();
       const rawData = [];
@@ -173,15 +184,16 @@
         return isActivo && isDateValid;
       });
 
-      if (filtered.length > 0 && JSON.stringify(filtered) !== JSON.stringify(productos)) {
-        productos = filtered;
-        updateDOMSlides();
-      }
+      // Actualizar automáticamente sin necesidad de recargar la página del navegador
+      productos = filtered;
+      updateDOMSlides();
     });
 
     function updateDOMSlides() {
       clearTimeout(stepTimeout);
       container.innerHTML = "";
+
+      if (productos.length === 0) return;
 
       productos.forEach((prod, index) => {
         const slide = document.createElement("div");
