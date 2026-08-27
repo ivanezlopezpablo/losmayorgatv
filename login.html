@@ -13,7 +13,7 @@
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
     
     body {
-      background: radial-gradient(circle at 50% 30%, #1e293b 0%, #0f172a 60%, #020617 100%);
+      background-color: #030712;
       color: #f8fafc;
       height: 100vh;
       width: 100vw;
@@ -24,14 +24,11 @@
       position: relative;
     }
 
-    /* MALLA CIBERNÉTICA DE FONDO */
-    .bg-grid {
+    /* CANVAS DE FONDO DINÁMICO FUTURISTA */
+    #futuristic-bg {
       position: absolute;
       top: 0; left: 0;
       width: 100%; height: 100%;
-      background-image: linear-gradient(to right, rgba(56, 189, 248, 0.05) 1px, transparent 1px),
-                        linear-gradient(to bottom, rgba(56, 189, 248, 0.05) 1px, transparent 1px);
-      background-size: 40px 40px;
       z-index: 1;
     }
 
@@ -42,11 +39,11 @@
       width: 100%;
       max-width: 420px;
       padding: 35px 30px;
-      background: rgba(15, 23, 42, 0.92);
-      backdrop-filter: blur(12px);
-      border: 1px solid rgba(56, 189, 248, 0.25);
+      background: rgba(15, 23, 42, 0.88);
+      backdrop-filter: blur(14px);
+      border: 1px solid rgba(56, 189, 248, 0.3);
       border-radius: 16px;
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+      box-shadow: 0 0 35px rgba(2, 132, 199, 0.25), inset 0 0 15px rgba(56, 189, 248, 0.1);
     }
 
     .login-header {
@@ -59,6 +56,7 @@
       height: 48px;
       fill: #38bdf8;
       margin-bottom: 10px;
+      filter: drop-shadow(0 0 8px rgba(56,189,248,0.5));
     }
 
     .login-header h1 {
@@ -106,7 +104,7 @@
     input[type="text"], input[type="password"] {
       width: 100%;
       padding: 12px 40px 12px 40px;
-      background: #0f172a;
+      background: rgba(15, 23, 42, 0.9);
       border: 1px solid #334155;
       border-radius: 8px;
       color: #fff;
@@ -117,7 +115,7 @@
 
     input:focus {
       border-color: #38bdf8;
-      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15);
+      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2);
     }
 
     .toggle-password {
@@ -146,7 +144,7 @@
     .btn-login {
       width: 100%;
       padding: 12px;
-      background: #0284c7;
+      background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
       color: #fff;
       font-weight: 700;
       border: none;
@@ -157,81 +155,22 @@
       letter-spacing: 0.5px;
       transition: all 0.2s ease;
       margin-top: 10px;
+      box-shadow: 0 4px 15px rgba(2, 132, 199, 0.4);
     }
 
     .btn-login:hover {
-      background: #0369a1;
+      background: linear-gradient(135deg, #38bdf8 0%, #0284c7 100%);
+      box-shadow: 0 6px 20px rgba(56, 189, 248, 0.6);
       transform: translateY(-1px);
     }
 
-    /* MODAL DE RECORRIDO GUIADO AL INGRESAR */
-    .modal-overlay {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100vw; height: 100vh;
-      background: rgba(2, 6, 23, 0.88);
-      backdrop-filter: blur(8px);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 100;
-    }
-
-    .modal-card {
-      background: #1e293b;
-      border: 1px solid #38bdf8;
-      border-radius: 14px;
-      padding: 30px;
-      max-width: 520px;
-      width: 90%;
-      box-shadow: 0 25px 50px rgba(0,0,0,0.7);
-      color: #f8fafc;
-    }
-
-    .modal-card h3 {
-      color: #38bdf8;
-      font-size: 18px;
-      font-weight: 700;
-      margin-bottom: 15px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .modal-card ul {
-      margin-left: 20px;
-      font-size: 13px;
-      color: #cbd5e1;
-      line-height: 1.6;
-      margin-bottom: 25px;
-    }
-
-    .modal-card li { margin-bottom: 10px; }
-
-    .btn-modal-start {
-      background: #16a34a;
-      color: #fff;
-      border: none;
-      padding: 12px;
-      border-radius: 8px;
-      font-weight: 700;
-      cursor: pointer;
-      width: 100%;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      font-size: 14px;
-      transition: background 0.2s;
-    }
-
-    .btn-modal-start:hover { background: #15803d; }
-
-    .hidden { display: none !important; }
     .error-msg { color: #f87171; font-size: 12px; text-align: center; margin-top: 12px; font-weight: 600; }
   </style>
 </head>
 <body>
 
-  <div class="bg-grid"></div>
+  <!-- CANVAS DE FONDO DINÁMICO FUTURISTA -->
+  <canvas id="futuristic-bg"></canvas>
 
   <div class="login-card">
     <div class="login-header">
@@ -281,24 +220,6 @@
     </form>
   </div>
 
-  <!-- MODAL DE RECORRIDO GUIADO Y RECOMENDACIONES (SE MUESTRA AL INGRESAR CORRECTAMENTE) -->
-  <div id="tour-modal" class="modal-overlay hidden">
-    <div class="modal-card">
-      <h3>
-        <svg style="width:22px;height:22px;fill:#38bdf8;" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
-        Bienvenido al Panel - Recorrido Guiado y Recomendaciones
-      </h3>
-      <ul>
-        <li><strong>Medidas de Imágenes:</strong> Cargar imágenes horizontales HD (<strong>1280 × 720 px</strong>) o Full HD (<strong>1920 × 1080 px</strong>) en formato 16:9.</li>
-        <li><strong>Formatos Soportados:</strong> Imágenes en <code>JPG</code> o <code>PNG</code>. Videos cortos en <code>MP4</code>.</li>
-        <li><strong>Estrategia de Cantidad:</strong> Se recomienda tener entre <strong>8 y 12 placas activas</strong> por ciclo para evitar aburrir al cliente en caja.</li>
-        <li><strong>Tiempo por Placa:</strong> Cada oferta rotará durante 7 segundos con una transición suave en fundido (*Crossfade*).</li>
-        <li><strong>Etiquetas Especiales:</strong> Activa el interruptor <em>OFERTA 🔥</em> o <em>NUEVO INGRESO ✨</em> según corresponda a cada producto.</li>
-      </ul>
-      <button class="btn-modal-start" onclick="goToAdminPanel()">Entrar al Panel de Control</button>
-    </div>
-  </div>
-
   <script>
     function togglePasswordVisibility(fieldId) {
       const field = document.getElementById(fieldId);
@@ -311,20 +232,76 @@
       const pass = document.getElementById("password-input").value.trim();
       const key = document.getElementById("keyword-input").value.trim();
 
-      // Validación de credenciales
+      // Credenciales: mayorga / mayorga123 / tv2026
       if (user === "mayorga" && pass === "mayorga123" && key === "tv2026") {
         sessionStorage.setItem("internal_auth_mayorga", "true");
-        // AL SER CORRECTO, ABRE EL RECORRIDO GUIADO Y RECOMENDACIONES
-        document.getElementById("tour-modal").classList.remove("hidden");
-        document.getElementById("error-message").classList.add("hidden");
+        window.location.href = "admin.html";
       } else {
         document.getElementById("error-message").classList.remove("hidden");
       }
     }
 
-    function goToAdminPanel() {
-      window.location.href = "admin.html";
+    // ANIMACIÓN CANVAS PARTÍCULAS
+    const canvas = document.getElementById('futuristic-bg');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+    const particleCount = 60;
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
     }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    class Particle {
+      constructor() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
+        this.vx = (Math.random() - 0.5) * 1;
+        this.vy = (Math.random() - 0.5) * 1;
+        this.radius = Math.random() * 2 + 1;
+      }
+      update() {
+        this.x += this.vx;
+        this.y += this.vy;
+        if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+        if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+      }
+      draw() {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fillStyle = '#38bdf8';
+        ctx.shadowBlur = 8;
+        ctx.shadowColor = '#0284c7';
+        ctx.fill();
+      }
+    }
+
+    for (let i = 0; i < particleCount; i++) particles.push(new Particle());
+
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for (let i = 0; i < particles.length; i++) {
+        particles[i].update();
+        particles[i].draw();
+        for (let j = i + 1; j < particles.length; j++) {
+          const dx = particles[i].x - particles[j].x;
+          const dy = particles[i].y - particles[j].y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < 120) {
+            ctx.beginPath();
+            ctx.moveTo(particles[i].x, particles[i].y);
+            ctx.lineTo(particles[j].x, particles[j].y);
+            ctx.strokeStyle = `rgba(56, 189, 248, ${1 - dist / 120})`;
+            ctx.lineWidth = 0.5;
+            ctx.stroke();
+          }
+        }
+      }
+      requestAnimationFrame(animate);
+    }
+    animate();
   </script>
 </body>
 </html>
