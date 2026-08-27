@@ -7,7 +7,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Roboto+Condensed:wght@700;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700;900&family=Roboto+Condensed:wght@700;900&display=swap" rel="stylesheet">
 
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
@@ -31,6 +31,40 @@
     .row { display: flex; gap: 15px; }
     .row .form-group { flex: 1; }
 
+    /* ESTILO INTERRUPTOR OFERTA (ROJO DESACTIVADO / VERDE ACTIVADO) */
+    .oferta-toggle-box {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #0f172a;
+      padding: 12px 15px;
+      border-radius: 8px;
+      border: 1px solid #334155;
+      margin-bottom: 15px;
+    }
+
+    .oferta-status-tag {
+      font-weight: bold;
+      font-size: 14px;
+      padding: 4px 10px;
+      border-radius: 20px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      transition: all 0.3s ease;
+    }
+
+    .oferta-status-tag.active {
+      background: #15803d;
+      color: #86efac;
+      border: 1px solid #22c55e;
+    }
+
+    .oferta-status-tag.inactive {
+      background: #7f1d1d;
+      color: #fca5a5;
+      border: 1px solid #ef4444;
+    }
+
     button { padding: 10px 18px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.2s; }
     .btn-primary { background: #0284c7; color: #fff; width: 100%; padding: 12px; font-size: 16px; margin-top: 10px; }
     .btn-primary:hover { background: #0369a1; }
@@ -41,6 +75,7 @@
     .btn-danger { background: #dc2626; color: #fff; font-size: 13px; padding: 6px 12px; }
     .btn-logout { background: #475569; color: #fff; font-size: 13px; padding: 8px 14px; }
 
+    /* PREVISUALIZACIÓN VISTA PREVIA SMART TV */
     .preview-container {
       position: relative;
       width: 100%;
@@ -75,6 +110,40 @@
       z-index: 1;
       text-align: center;
       padding: 20px;
+    }
+
+    /* BADGE OFERTA 3D CON FUEGUITO ANIMADO (MARGEN SUPERIOR IZQUIERDO) */
+    .badge-oferta-3d {
+      position: absolute;
+      top: 6%;
+      left: 10%;
+      z-index: 10;
+      background: linear-gradient(180deg, #ffe600 0%, #ff8800 50%, #d90000 100%);
+      color: #fff;
+      font-weight: 900;
+      font-size: 1.1rem;
+      padding: 3px 14px;
+      border-radius: 6px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      border: 2px solid #fff;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.7), inset 0 2px 2px rgba(255,255,255,0.6);
+      text-shadow: 2px 2px 0px #700000;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transform: rotate(-3deg);
+      transition: opacity 0.3s ease;
+    }
+
+    .fire-icon {
+      display: inline-block;
+      animation: flameAnim 0.8s infinite alternate ease-in-out;
+    }
+
+    @keyframes flameAnim {
+      0% { transform: scale(1) rotate(-5deg); filter: drop-shadow(0 0 2px #ff3300); }
+      100% { transform: scale(1.25) rotate(5deg); filter: drop-shadow(0 0 8px #ffff00); }
     }
 
     .preview-overlay {
@@ -166,7 +235,7 @@
 
     .switch { position: relative; display: inline-block; width: 50px; height: 26px; flex-shrink: 0; }
     .switch input { opacity: 0; width: 0; height: 0; }
-    .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #64748b; transition: .4s; border-radius: 34px; }
+    .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #dc2626; transition: .4s; border-radius: 34px; }
     .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
     input:checked + .slider { background-color: #22c55e; }
     input:checked + .slider:before { transform: translateX(24px); }
@@ -188,7 +257,7 @@
   <div class="container">
     
     <div class="admin-grid">
-      <!-- FORMULARIO -->
+      <!-- FORMULARIO DE CARGA -->
       <div class="card">
         <div class="header-bar">
           <h2 id="form-header-title">Cargar Nueva Oferta</h2>
@@ -200,6 +269,19 @@
             <label id="img-label">Imagen o Video MP4 del Producto</label>
             <input type="file" id="prod-img" accept="image/*,video/mp4" onchange="updatePreviewMedia(this)">
           </div>
+
+          <!-- INTERRUPTOR CARTEL DE OFERTA -->
+          <div class="oferta-toggle-box">
+            <label style="margin:0; font-weight:bold; color:#fff;">Mostrar Cartel "OFERTA 🔥"</label>
+            <div style="display:flex; align-items:center; gap:12px;">
+              <span id="oferta-tag-status" class="oferta-status-tag inactive">Insignia DESACTIVADA</span>
+              <label class="switch">
+                <input type="checkbox" id="prod-show-oferta" onchange="toggleOfertaBadge(this.checked)">
+                <span class="slider"></span>
+              </label>
+            </div>
+          </div>
+
           <div class="row">
             <div class="form-group">
               <label>Título (ej. CERVEZA)</label>
@@ -241,15 +323,20 @@
         <div id="status" class="hidden"></div>
       </div>
 
-      <!-- PREVISUALIZACIÓN -->
+      <!-- PREVISUALIZACIÓN VISTA PREVIA SMART TV -->
       <div class="card">
         <h2>Vista Previa en Vivo (Smart TV)</h2>
         <p style="font-size: 13px; color: #94a3b8; margin-bottom: 15px;">Así es como se proyectará esta oferta exactamente en los televisores del local.</p>
         
         <div class="preview-container">
+          <!-- BADGE DE OFERTA ANIMADO -->
+          <div id="prev-badge-oferta" class="badge-oferta-3d hidden">
+            <span>¡OFERTA!</span><span class="fire-icon">🔥</span>
+          </div>
+
           <div id="prev-placeholder" class="preview-placeholder">Selecciona una imagen o video MP4 para ver la vista previa</div>
           <img id="prev-bg" class="preview-bg" crossorigin="anonymous">
-          <video id="prev-video" class="preview-bg" autoplay loop muted playsinline></video>
+          <video id="prev-video" class="preview-bg" autoplay loop muted playsinline crossorigin="anonymous"></video>
           
           <div class="preview-overlay">
             <div id="prev-title" class="preview-title">CERVEZA</div>
@@ -277,7 +364,7 @@
     </div>
   </div>
 
-  <!-- MODALES CONFIRMACIÓN -->
+  <!-- MODALES DE CONFIRMACIÓN -->
   <div id="modal-confirm" class="modal-overlay hidden">
     <div class="modal-box">
       <h3 id="modal-title">¿Estás seguro?</h3>
@@ -338,6 +425,21 @@
     const sortableList = document.getElementById('product-list');
     new Sortable(sortableList, { animation: 150 });
 
+    function toggleOfertaBadge(isActive) {
+      const tag = document.getElementById("oferta-tag-status");
+      const previewBadge = document.getElementById("prev-badge-oferta");
+
+      if (isActive) {
+        tag.textContent = "Insignia ACTIVADA";
+        tag.className = "oferta-status-tag active";
+        previewBadge.classList.remove("hidden");
+      } else {
+        tag.textContent = "Insignia DESACTIVADA";
+        tag.className = "oferta-status-tag inactive";
+        previewBadge.classList.add("hidden");
+      }
+    }
+
     function updatePreviewText() {
       document.getElementById("prev-title").textContent = (document.getElementById("prod-title").value || "TÍTULO").toUpperCase();
       document.getElementById("prev-sub").textContent = (document.getElementById("prod-sub").value || "SUBTÍTULO").toUpperCase();
@@ -354,43 +456,13 @@
       document.getElementById("prev-vol").style.color = colorVol;
     }
 
-    function updatePreviewMedia(input) {
-      if (input.files && input.files[0]) {
-        const file = input.files[0];
-        const bgImg = document.getElementById("prev-bg");
-        const bgVid = document.getElementById("prev-video");
-        const placeholder = document.getElementById("prev-placeholder");
-
-        const reader = new FileReader();
-        reader.onload = function(e) {
-          placeholder.style.display = "none";
-
-          if (file.type.startsWith("video/")) {
-            bgImg.style.display = "none";
-            bgVid.src = e.target.result;
-            bgVid.style.display = "block";
-            setPreviewColors("#38bdf8", "#fef08a");
-          } else {
-            bgVid.style.display = "none";
-            bgImg.src = e.target.result;
-            bgImg.style.display = "block";
-
-            bgImg.onload = function() {
-              extractColorsFromImage(bgImg);
-            };
-          }
-        }
-        reader.readAsDataURL(file);
-      }
-    }
-
-    function extractColorsFromImage(imgElement) {
+    function extractColorsFromMedia(mediaElement) {
       try {
         const canvas = document.createElement("canvas");
         const ctx = canvas.getContext("2d");
         canvas.width = 100;
         canvas.height = 100;
-        ctx.drawImage(imgElement, 0, 0, 100, 100);
+        ctx.drawImage(mediaElement, 0, 0, 100, 100);
 
         const imgData = ctx.getImageData(0, 0, 100, 100).data;
         let rSum = 0, gSum = 0, bSum = 0, count = 0;
@@ -430,6 +502,39 @@
       }
     }
 
+    function updatePreviewMedia(input) {
+      if (input.files && input.files[0]) {
+        const file = input.files[0];
+        const bgImg = document.getElementById("prev-bg");
+        const bgVid = document.getElementById("prev-video");
+        const placeholder = document.getElementById("prev-placeholder");
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          placeholder.style.display = "none";
+
+          if (file.type.startsWith("video/")) {
+            bgImg.style.display = "none";
+            bgVid.src = e.target.result;
+            bgVid.style.display = "block";
+
+            bgVid.onloadeddata = function() {
+              extractColorsFromMedia(bgVid);
+            };
+          } else {
+            bgVid.style.display = "none";
+            bgImg.src = e.target.result;
+            bgImg.style.display = "block";
+
+            bgImg.onload = function() {
+              extractColorsFromMedia(bgImg);
+            };
+          }
+        }
+        reader.readAsDataURL(file);
+      }
+    }
+
     function loadProductsFromFirebase() {
       db.collection("productos").onSnapshot(snapshot => {
         productosList = [];
@@ -461,11 +566,15 @@
           ? `<video src="${p.imagenUrl}" class="product-thumb" muted></video>` 
           : `<img src="${p.imagenUrl}" class="product-thumb">`;
 
+        const badgeIndicator = p.showOfertaBadge 
+          ? `<span style="background:#15803d; color:#86efac; font-size:11px; padding:2px 6px; border-radius:4px; font-weight:bold; margin-left:6px;">🔥 OFERTA</span>` 
+          : '';
+
         li.innerHTML = `
           <div class="product-info">
             ${thumbMedia}
             <div class="product-details">
-              <h4>${p.titulo} - $${p.precioEntero} ${isVideo ? '📹 (Video)' : ''}</h4>
+              <h4>${p.titulo} - $${p.precioEntero} ${badgeIndicator} ${isVideo ? '📹' : ''}</h4>
               <p>${p.subtitulo || ''} ${p.fechaProgramada ? '| 🕒 Prog: ' + p.fechaProgramada.replace('T', ' ') : ''}</p>
             </div>
           </div>
@@ -500,6 +609,10 @@
       document.getElementById("prod-price-dec").value = prod.precioDecimal || "00";
       document.getElementById("prod-date").value = prod.fechaProgramada || "";
 
+      const showBadge = prod.showOfertaBadge === true;
+      document.getElementById("prod-show-oferta").checked = showBadge;
+      toggleOfertaBadge(showBadge);
+
       document.getElementById("form-header-title").textContent = "Editar Oferta Existente";
       document.getElementById("img-label").textContent = "Cambiar Archivo (Opcional - Dejar vacío para conservar)";
       document.getElementById("btn-submit").textContent = "Guardar Cambios";
@@ -531,6 +644,9 @@
       currentExistingMediaType = "image";
 
       document.getElementById("product-form").reset();
+      document.getElementById("prod-show-oferta").checked = false;
+      toggleOfertaBadge(false);
+
       document.getElementById("form-header-title").textContent = "Cargar Nueva Oferta";
       document.getElementById("img-label").textContent = "Imagen o Video MP4 del Producto";
       document.getElementById("btn-submit").textContent = "Publicar Oferta";
@@ -639,7 +755,6 @@
           formData.append("file", file);
           formData.append("upload_preset", CLOUDINARY_PRESET);
 
-          // URL de subida dinámica según si es video o foto
           const endpoint = isVideo 
             ? `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/video/upload`
             : `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`;
@@ -660,6 +775,7 @@
         const payload = {
           imagenUrl: finalImageUrl,
           tipoMedia: detectedType,
+          showOfertaBadge: document.getElementById("prod-show-oferta").checked,
           titulo: document.getElementById("prod-title").value.toUpperCase(),
           subtitulo: document.getElementById("prod-sub").value.toUpperCase(),
           volumen: document.getElementById("prod-vol").value.toUpperCase(),
