@@ -62,28 +62,20 @@
     const BADGE_OFERTA_URL = "https://firebasestorage.googleapis.com/v0/b/losmayorgatv.firebasestorage.app/o/Incorporadas%20en%20App%20TV%2FOferta.png?alt=media&token=92984e5a-de83-4086-ab5e-76c85ab558d5";
     const BADGE_NUEVO_URL = "https://firebasestorage.googleapis.com/v0/b/losmayorgatv.firebasestorage.app/o/Incorporadas%20en%20App%20TV%2FNuevo%20Ingreso.png?alt=media&token=b1645d33-9076-46ed-a076-059d58b05b1f";
 
-    let FRAME_URLS = {
-      navidad: "https://firebasestorage.googleapis.com/v0/b/losmayorgatv.firebasestorage.app/o/Incorporadas%20en%20App%20TV%2FNavidad.png?alt=media&token=68541b34-fb3b-4066-bf57-d944a3c2397f",
-      pascuas: "https://firebasestorage.googleapis.com/v0/b/losmayorgatv.firebasestorage.app/o/Incorporadas%20en%20App%20TV%2FPascuas.png?alt=media&token=4d0802fd-7109-49f4-904f-adee5206f8cf",
-      generico: ""
-    };
-
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
     const DURACION_SLIDE_MS = 7000;
     const container = document.getElementById("slider-container");
     let productos = [];
-    let activeGlobalFrame = "none";
+    let activeGlobalFrameUrl = "";
     let currentIndex = 0;
     let stepTimeout = null;
 
     db.collection("configuracion").doc("marcos").onSnapshot(doc => {
       if (doc.exists) {
-        const data = doc.data();
-        activeGlobalFrame = data.activeFrame || "none";
-        if (data.urls) FRAME_URLS = { ...FRAME_URLS, ...data.urls };
-      } else { activeGlobalFrame = "none"; }
+        activeGlobalFrameUrl = doc.data().activeFrameUrl || "";
+      } else { activeGlobalFrameUrl = ""; }
       updateDOMSlides();
     });
 
@@ -142,8 +134,8 @@
 
         let themeFrameHTML = "";
         const hasTitle = prod.titulo && prod.titulo.trim() !== "";
-        if (hasTitle && activeGlobalFrame !== "none" && FRAME_URLS[activeGlobalFrame]) {
-          themeFrameHTML = `<img class="theme-frame-tv animate__animated animate__fadeIn" src="${FRAME_URLS[activeGlobalFrame]}">`;
+        if (hasTitle && activeGlobalFrameUrl !== "") {
+          themeFrameHTML = `<img class="theme-frame-tv animate__animated animate__fadeIn" src="${activeGlobalFrameUrl}">`;
         }
 
         slide.innerHTML = `
