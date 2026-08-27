@@ -39,6 +39,7 @@
       padding: 25px; border-radius: 14px;
       box-shadow: 0 10px 30px rgba(0,0,0,0.6);
       border: 1px solid rgba(56, 189, 248, 0.2);
+      transition: box-shadow 0.3s ease, border-color 0.3s ease;
     }
 
     .header-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
@@ -52,6 +53,20 @@
 
     .badge-selection-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: #0f172a; padding: 12px; border-radius: 8px; border: 1px solid #334155; margin-bottom: 15px; }
     .badge-option { display: flex; flex-direction: column; gap: 6px; }
+
+    /* CONTROLES DE POSICIÓN Y TAMAÑO DE INSIGNIA */
+    .badge-controls-panel {
+      background: #0f172a;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px dashed #38bdf8;
+      margin-bottom: 15px;
+    }
+    .badge-slider-group { margin-bottom: 8px; }
+    .badge-slider-group label { display: flex; justify-content: space-between; font-size: 11px; color: #cbd5e1; }
+    .badge-slider-group input[type="range"] {
+      width: 100%; height: 6px; border-radius: 3px; background: #334155; outline: none; padding: 0;
+    }
 
     .status-pill { font-size: 11px; font-weight: bold; padding: 2px 6px; border-radius: 12px; text-transform: uppercase; width: fit-content; }
     .status-pill.active { background: #15803d; color: #86efac; }
@@ -69,7 +84,6 @@
     .btn-tour { background: #0284c7; color: #fff; font-size: 12px; padding: 8px 12px; }
     .btn-logout { background: #475569; color: #fff; font-size: 12px; padding: 8px 12px; }
 
-    /* DASHBOARD MARCOS TEMPORALES */
     .theme-frame-panel { background: #0f172a; padding: 18px; border-radius: 10px; border: 1px solid #38bdf8; margin-bottom: 20px; }
     .theme-frame-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-top: 12px; }
     @media (max-width: 900px) { .theme-frame-grid { grid-template-columns: 1fr; } }
@@ -83,32 +97,36 @@
 
     .marketing-tip { background: #1e1b4b; border-left: 4px solid #818cf8; padding: 12px; border-radius: 6px; font-size: 13px; color: #c7d2fe; margin-bottom: 15px; }
 
-    .preview-container { position: relative; width: 100%; padding-top: 56.25%; background: #000; border-radius: 8px; overflow: hidden; border: 2px solid #38bdf8; box-shadow: 0 5px 15px rgba(0,0,0,0.8); font-family: 'Oswald', sans-serif; }
+    .preview-container { position: relative; width: 100%; padding-top: 56.25%; background: #000; border-radius: 8px; overflow: hidden; border: 2px solid #38bdf8; box-shadow: 0 5px 15px rgba(0,0,0,0.8); font-family: 'Oswald', sans-serif; user-select: none; }
     .preview-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; display: none; }
     .preview-placeholder { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; color: #64748b; font-size: 14px; z-index: 1; text-align: center; padding: 20px; }
 
+    /* INSIGNIAS ARRASTRABLES CON EL MOUSE */
     .badge-img-preview {
       position: absolute;
-      top: 5%;
-      left: 8%;
-      z-index: 10;
-      width: 20%;
-      height: auto;
+      z-index: 20;
       object-fit: contain;
       filter: drop-shadow(0 4px 8px rgba(0,0,0,0.8));
+      cursor: grab;
+      border: 1px dashed rgba(56, 189, 248, 0.5);
+      border-radius: 4px;
+    }
+    .badge-img-preview:active {
+      cursor: grabbing;
+      border-color: #fef08a;
     }
 
     .preview-frame-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: fill; z-index: 12; pointer-events: none; }
     .preview-legal-banner { position: absolute; bottom: 8%; left: 10%; z-index: 10; background: #dc2626; color: #ffffff; font-family: system-ui, sans-serif; font-size: 0.55rem; font-weight: 800; padding: 3px 8px; border-radius: 3px; box-shadow: 0 2px 8px rgba(0,0,0,0.8); max-width: 42%; line-height: 1.1; text-transform: uppercase; }
 
-    .preview-overlay { position: absolute; top: 0; left: 0; width: 55%; height: 100%; z-index: 2; display: flex; flex-direction: column; justify-content: center; padding-left: 10%; color: #fff; text-transform: uppercase; }
+    .preview-overlay { position: absolute; top: 0; left: 0; width: 55%; height: 100%; z-index: 2; display: flex; flex-direction: column; justify-content: center; padding-left: 10%; color: #fff; text-transform: uppercase; pointer-events: none; }
     .preview-title { font-size: 2.2rem; font-weight: 700; color: #38bdf8; line-height: 0.85; text-shadow: 0 4px 15px rgba(0,0,0,0.9); }
     .preview-vol { font-size: 2rem; font-weight: 700; color: #fef08a; line-height: 0.8; text-shadow: 0 4px 15px rgba(0,0,0,0.9); }
     .preview-subtitle { font-size: 0.8rem; font-weight: 700; color: #ffffff; margin-top: 6px; text-shadow: 0 3px 10px rgba(0,0,0,0.95); }
     .preview-details { display: flex; align-items: baseline; gap: 10px; margin-top: 6px; }
     .preview-pack { font-size: 0.8rem; font-weight: 700; color: #ffffff; line-height: 0.95; max-width: 45%; text-shadow: 0 3px 10px rgba(0,0,0,0.95); }
 
-    .preview-price { position: absolute; bottom: 14%; right: 12%; z-index: 3; background-color: #fff; padding: 2px 10px; font-family: 'Roboto Condensed', sans-serif; color: #000; font-size: 1.6rem; font-weight: 900; display: flex; align-items: flex-start; box-shadow: 0 5px 15px rgba(0,0,0,0.6); border-radius: 4px; }
+    .preview-price { position: absolute; bottom: 14%; right: 12%; z-index: 3; background-color: #fff; padding: 2px 10px; font-family: 'Roboto Condensed', sans-serif; color: #000; font-size: 1.6rem; font-weight: 900; display: flex; align-items: flex-start; box-shadow: 0 5px 15px rgba(0,0,0,0.6); border-radius: 4px; pointer-events: none; }
     .preview-price .cents { font-size: 0.8rem; text-decoration: underline; margin-left: 2px; }
 
     .product-list { list-style: none; }
@@ -130,79 +148,52 @@
     input:checked + .slider { background-color: #22c55e; }
     input:checked + .slider:before { transform: translateX(22px); }
 
-    /* ESTILOS PARA RECORRIDO GUIADO PASO A PASO */
-    .tour-modal-card {
+    /* ESTILOS PARA RECORRIDO GUIADO SPOTLIGHT (FONDO OSCURO E ILUMINACIÓN) */
+    .tour-backdrop {
+      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+      background: rgba(0, 0, 0, 0.85);
+      z-index: 9990;
+      pointer-events: auto;
+      transition: all 0.3s ease;
+    }
+
+    .tour-spotlight-highlight {
+      position: relative !important;
+      z-index: 9995 !important;
+      box-shadow: 0 0 0 6px #38bdf8, 0 0 35px #0284c7 !important;
+      border-radius: 10px !important;
+      transition: all 0.3s ease;
+      background: rgba(15, 23, 42, 0.98) !important;
+    }
+
+    .tour-popover-card {
+      position: fixed;
+      z-index: 9999;
       background: #1e293b;
-      border: 1px solid #38bdf8;
+      border: 2px solid #38bdf8;
       border-radius: 14px;
-      padding: 25px;
-      max-width: 520px;
+      padding: 22px;
+      max-width: 450px;
       width: 90%;
-      box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+      box-shadow: 0 20px 50px rgba(0,0,0,0.9);
       color: #f8fafc;
-      position: relative;
+      transition: all 0.3s ease;
     }
 
     .tour-step-badge {
-      background: #0284c7;
-      color: #fff;
-      font-size: 11px;
-      font-weight: 800;
-      padding: 4px 10px;
-      border-radius: 20px;
-      text-transform: uppercase;
-      width: fit-content;
-      margin-bottom: 12px;
+      background: #0284c7; color: #fff; font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 20px; text-transform: uppercase; width: fit-content; margin-bottom: 10px;
     }
-
-    .tour-title {
-      color: #38bdf8;
-      font-size: 18px;
-      font-weight: 700;
-      margin-bottom: 10px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .tour-content {
-      font-size: 13.5px;
-      color: #cbd5e1;
-      line-height: 1.6;
-      margin-bottom: 20px;
-    }
-
-    .tour-content strong { color: #fff; }
-
-    .tour-actions {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding-top: 15px;
-      border-top: 1px solid #334155;
-    }
-
-    .tour-btn-group { display: flex; gap: 8px; }
-
-    .btn-tour-next { background: #16a34a; color: #fff; font-size: 13px; padding: 8px 16px; }
-    .btn-tour-prev { background: #475569; color: #fff; font-size: 13px; padding: 8px 14px; }
-    .btn-tour-skip { background: transparent; color: #94a3b8; font-size: 12px; text-decoration: underline; padding: 8px; }
-
-    .tour-disable-option {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 11px;
-      color: #94a3b8;
-      margin-top: 12px;
-    }
+    .tour-title { color: #38bdf8; font-size: 17px; font-weight: 700; margin-bottom: 8px; }
+    .tour-content { font-size: 13px; color: #cbd5e1; line-height: 1.6; margin-bottom: 18px; }
+    .tour-actions { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #334155; padding-top: 12px; }
+    .btn-tour-next { background: #16a34a; color: #fff; font-size: 12px; padding: 8px 14px; border-radius: 6px; font-weight: bold; }
+    .btn-tour-prev { background: #475569; color: #fff; font-size: 12px; padding: 8px 12px; border-radius: 6px; font-weight: bold; }
+    .btn-tour-skip { background: transparent; color: #94a3b8; font-size: 12px; text-decoration: underline; padding: 6px; cursor: pointer; border: none; }
 
     .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.85); display: flex; justify-content: center; align-items: center; z-index: 9999; backdrop-filter: blur(5px); }
     .modal-box { background: #1e293b; padding: 25px; border-radius: 12px; max-width: 480px; width: 90%; border: 1px solid #38bdf8; color: #f8fafc; }
     .modal-box h3 { color: #38bdf8; margin-bottom: 12px; font-size: 18px; }
-    .modal-box p, .modal-box ul { color: #cbd5e1; font-size: 13px; margin-bottom: 20px; line-height: 1.6; }
-    .modal-box ul { margin-left: 18px; }
-    .modal-box li { margin-bottom: 6px; }
+    .modal-box p { color: #cbd5e1; font-size: 13px; margin-bottom: 20px; line-height: 1.6; }
     .modal-actions { display: flex; gap: 10px; justify-content: center; }
 
     .hidden { display: none !important; }
@@ -217,8 +208,8 @@
 
   <div class="container">
     
-    <!-- SECCIÓN DE MARCOS TEMÁTICOS CON CARGA DE IMAGEN -->
-    <div class="card theme-frame-panel">
+    <!-- SECCIÓN DE MARCOS TEMÁTICOS -->
+    <div id="tour-step-frames" class="card theme-frame-panel">
       <h2 style="color: #fef08a;">🎄 Marcos Temáticos Temporales (Configuración Global)</h2>
       <p style="font-size: 12px; color: #94a3b8; margin-top: 4px;">Activa o sube imágenes PNG transparentes para los marcos temáticos.</p>
       
@@ -266,7 +257,7 @@
 
     <div class="admin-grid">
       <!-- FORMULARIO DE CARGA -->
-      <div class="card">
+      <div id="tour-step-form" class="card">
         <div class="header-bar">
           <h2 id="form-header-title">Cargar Nueva Oferta</h2>
           <div class="nav-buttons">
@@ -281,7 +272,7 @@
             <input type="file" id="prod-img" accept="image/*,video/mp4" onchange="updatePreviewMedia(this)">
           </div>
 
-          <div class="badge-selection-grid">
+          <div id="tour-step-badges" class="badge-selection-grid">
             <div class="badge-option">
               <div style="display:flex; justify-content:space-between; align-items:center;">
                 <label style="margin:0; font-weight:bold; color:#fff;">OFERTA 🔥</label>
@@ -302,6 +293,27 @@
                 </label>
               </div>
               <span id="nuevo-tag-status" class="status-pill inactive">DESACTIVADO</span>
+            </div>
+          </div>
+
+          <!-- CONTROLES DINÁMICOS DE TAMAÑO Y UBICACIÓN -->
+          <div id="badge-controls-box" class="badge-controls-panel hidden">
+            <label style="color:#38bdf8; margin-bottom:8px;">📐 Ajustar Ubicación y Tamaño de Insignia</label>
+            <p style="font-size: 11px; color: #94a3b8; margin-bottom: 8px;">💡 O puedes arrastrar la insignia directamente con el mouse en la vista previa.</p>
+            
+            <div class="badge-slider-group">
+              <label>Tamaño (Escala): <span id="val-badge-scale">20%</span></label>
+              <input type="range" id="badge-scale" min="10" max="40" value="20" oninput="updateBadgeTransformations()">
+            </div>
+
+            <div class="badge-slider-group">
+              <label>Posición Horizontal (X): <span id="val-badge-pos-x">8%</span></label>
+              <input type="range" id="badge-pos-x" min="0" max="80" value="8" oninput="updateBadgeTransformations()">
+            </div>
+
+            <div class="badge-slider-group">
+              <label>Posición Vertical (Y): <span id="val-badge-pos-y">5%</span></label>
+              <input type="range" id="badge-pos-y" min="0" max="80" value="5" oninput="updateBadgeTransformations()">
             </div>
           </div>
 
@@ -352,11 +364,11 @@
       </div>
 
       <!-- PREVISUALIZACIÓN -->
-      <div class="card">
+      <div id="tour-step-preview" class="card">
         <h2>Vista Previa en Vivo (Smart TV)</h2>
-        <p style="font-size: 13px; color: #94a3b8; margin-bottom: 15px;">Así se proyectará exactamente en las TV.</p>
+        <p style="font-size: 13px; color: #94a3b8; margin-bottom: 15px;">Arrastra la insignia con el mouse para posicionarla.</p>
         
-        <div class="preview-container">
+        <div id="preview-box-container" class="preview-container">
           <img id="prev-badge-oferta" class="badge-img-preview animate__animated animate__zoomIn hidden" src="https://firebasestorage.googleapis.com/v0/b/losmayorgatv.firebasestorage.app/o/Incorporadas%20en%20App%20TV%2FOferta.png?alt=media&token=92984e5a-de83-4086-ab5e-76c85ab558d5">
           <img id="prev-badge-nuevo" class="badge-img-preview animate__animated animate__zoomIn hidden" src="https://firebasestorage.googleapis.com/v0/b/losmayorgatv.firebasestorage.app/o/Incorporadas%20en%20App%20TV%2FNuevo%20Ingreso.png?alt=media&token=b1645d33-9076-46ed-a076-059d58b05b1f">
 
@@ -387,7 +399,7 @@
     </div>
 
     <!-- PANEL DE MÉTRICAS Y LISTA -->
-    <div class="card">
+    <div id="tour-step-list" class="card">
       <div class="header-bar">
         <h2>Productos en Pantalla</h2>
         <button class="btn-save-order" onclick="requestSaveOrder()">Guardar Nuevo Orden</button>
@@ -414,27 +426,18 @@
     </div>
   </div>
 
-  <!-- MODAL DE RECORRIDO GUIADO INTERACTIVO PASO A PASO -->
-  <div id="interactive-tour-modal" class="modal-overlay hidden">
-    <div class="tour-modal-card">
-      <div id="tour-step-badge" class="tour-step-badge">Paso 1 de 6</div>
-      <h3 id="tour-step-title" class="tour-title">Bienvenido al Panel de Control</h3>
-      
-      <div id="tour-step-content" class="tour-content">
-        Cargando recorrido interactivo...
-      </div>
-
-      <div class="tour-actions">
-        <button class="btn-tour-skip" onclick="closeTourModal()">Omitir Recorrido ✕</button>
-        <div class="tour-btn-group">
-          <button id="btn-tour-prev" class="btn-tour-prev" onclick="navigateTour(-1)">⬅️ Anterior</button>
-          <button id="btn-tour-next" class="btn-tour-next" onclick="navigateTour(1)">Siguiente ➡️</button>
-        </div>
-      </div>
-
-      <div class="tour-disable-option">
-        <input type="checkbox" id="chk-disable-autotour" onchange="toggleAutoTourPreference(this)">
-        <label for="chk-disable-autotour" style="margin:0; font-size:11px; text-transform:none;">No volver a abrir automáticamente al ingresar</label>
+  <!-- ELEMENTOS PARA RECORRIDO GUIADO INTERACTIVO SPOTLIGHT -->
+  <div id="tour-backdrop" class="tour-backdrop hidden"></div>
+  
+  <div id="tour-popover" class="tour-popover-card hidden">
+    <div id="tour-step-badge" class="tour-step-badge">Paso 1 de 5</div>
+    <h3 id="tour-step-title" class="tour-title">Bienvenido</h3>
+    <div id="tour-step-content" class="tour-content">Contenido del paso...</div>
+    <div class="tour-actions">
+      <button class="btn-tour-skip" onclick="closeTourModal()">Omitir ✕</button>
+      <div>
+        <button id="btn-tour-prev" class="btn-tour-prev" onclick="navigateTour(-1)">⬅️ Anterior</button>
+        <button id="btn-tour-next" class="btn-tour-next" onclick="navigateTour(1)">Siguiente ➡️</button>
       </div>
     </div>
   </div>
@@ -498,80 +501,129 @@
     let detectedColorTitle = "#38bdf8";
     let detectedColorVol = "#fef08a";
 
-    // ESTRUCTURA DEL RECORRIDO GUIADO PASO A PASO
+    // ----------------------------------------------------------------
+    // RECORRIDO GUIADO SPOTLIGHT (ILUMINACIÓN DE ELEMENTOS CON MOUSE)
+    // ----------------------------------------------------------------
     let currentTourStep = 0;
     const tourSteps = [
       {
+        targetId: "tour-step-frames",
         title: "🎄 Marcos Temáticos Temporales",
-        content: "En la parte superior puedes activar un marco decorativo (<strong>Navidad, Pascuas o Genérico</strong>). El marco se superpone automáticamente en todas las pantallas TV sobre los productos que tengan <strong>Título cargado</strong>. También puedes cambiar la imagen PNG usando el botón '📁 Cambiar Marco'."
+        content: "En este panel puedes activar o subir imágenes PNG transparentes para **Navidad, Pascuas o Marco Genérico**. Se aplicarán a todas las pantallas que tengan Título cargado."
       },
       {
-        title: "🔥 Insignias de Oferta y Nuevo Ingreso",
-        content: "Si activas el interruptor <strong>OFERTA 🔥</strong> o <strong>NUEVO INGRESO ✨</strong>, la televisión mostrará la insignia oficial flotante en la esquina superior izquierda. Además, al activar Oferta, puedes fijar opcionalmente una fecha límite de validez."
+        targetId: "tour-step-badges",
+        title: "🔥 Insignias y Movimiento con Mouse",
+        content: "Puedes activar la insignia **OFERTA** o **NUEVO INGRESO**. ¡Lo nuevo es que puedes **moverla con el mouse** en la vista previa a la derecha!"
       },
       {
-        title: "📝 Carga de Datos de Productos",
-        content: "Ingresa la imagen/video MP4, Título, Subtítulo, Volumen y Precio. <br><br>💡 <strong>RECOMENDACIÓN:</strong> Si subes una imagen promocional que ya viene editada con texto desde origen, <strong>deja el Título vacío</strong>. Así el sistema no superpondrá textos."
+        targetId: "tour-step-form",
+        title: "📝 Formulario de Carga",
+        content: "Completa la imagen o video MP4, los textos y el precio. Recuerda: si la foto ya viene editada desde el inicio, **deja el Título vacío**."
       },
       {
-        title: "📺 Previsualización Smart TV en Vivo",
-        content: "A la derecha verás una simulación idéntica a cómo se verá la televisión. El sistema detecta automáticamente los colores de tu imagen para ajustar las letras, y muestra el precio animado reubicado en la esquina inferior izquierda."
+        targetId: "tour-step-preview",
+        title: "📺 Previsualización e Interactividad",
+        content: "Muestra cómo se verá en las TV. **Haz clic y arrastra la insignia directamente sobre la pantalla** para acomodarla perfectamente."
       },
       {
-        title: "📊 Métricas de Rotación y Reordenamiento",
-        content: "El panel te indica cuántas placas hay activas y la duración exacta del ciclo completo. Puedes cambiar el orden de las ofertas simplemente **arrastrando el ícono de 3 rayitas (☰)** y guardando el nuevo orden."
-      },
-      {
-        title: "🔒 Confirmación Segura de Cambios",
-        content: "Cada vez que edites, elimines o cambies el orden, el sistema te solicitará una <strong>Doble Reconfirmación Obligatoria</strong> para evitar cambios accidentales en las pantallas de tu local."
+        targetId: "tour-step-list",
+        title: "📊 Orden y Reconfirmación Segura",
+        content: "Puedes cambiar el orden arrastrando las 3 rayitas (☰). Todos los cambios requieren **Doble Reconfirmación** para evitar errores."
       }
     ];
 
     function startGuidedTour(step = 0) {
       currentTourStep = step;
+      document.getElementById("tour-backdrop").classList.remove("hidden");
+      document.getElementById("tour-popover").classList.remove("hidden");
       renderTourStep();
-      document.getElementById("interactive-tour-modal").classList.remove("hidden");
     }
 
     function renderTourStep() {
+      // Limpiar resaltado previo
+      document.querySelectorAll(".tour-spotlight-highlight").forEach(el => el.classList.remove("tour-spotlight-highlight"));
+
       const stepData = tourSteps[currentTourStep];
+      const targetEl = document.getElementById(stepData.targetId);
+
+      if (targetEl) {
+        targetEl.classList.add("tour-spotlight-highlight");
+        targetEl.scrollIntoView({ behavior: "smooth", block: "center" });
+
+        // Posicionar popover cerca del elemento
+        setTimeout(() => {
+          const rect = targetEl.getBoundingClientRect();
+          const popover = document.getElementById("tour-popover");
+          let topPos = rect.bottom + 15;
+          let leftPos = rect.left + (rect.width / 2) - 225;
+
+          if (topPos + 220 > window.innerHeight) topPos = Math.max(20, rect.top - 230);
+          if (leftPos < 20) leftPos = 20;
+          if (leftPos + 450 > window.innerWidth) leftPos = window.innerWidth - 470;
+
+          popover.style.top = `${topPos}px`;
+          popover.style.left = `${leftPos}px`;
+        }, 200);
+      }
+
       document.getElementById("tour-step-badge").textContent = `Paso ${currentTourStep + 1} de ${tourSteps.length}`;
       document.getElementById("tour-step-title").innerHTML = stepData.title;
       document.getElementById("tour-step-content").innerHTML = stepData.content;
 
-      document.getElementById("btn-tour-prev").style.display = (currentTourStep === 0) ? "none" : "block";
+      document.getElementById("btn-tour-prev").style.display = (currentTourStep === 0) ? "none" : "inline-block";
       const nextBtn = document.getElementById("btn-tour-next");
-
-      if (currentTourStep === tourSteps.length - 1) {
-        nextBtn.textContent = "Finalizar Tour ✓";
-        nextBtn.style.background = "#15803d";
-      } else {
-        nextBtn.textContent = "Siguiente ➡️";
-        nextBtn.style.background = "#16a34a";
-      }
+      nextBtn.textContent = (currentTourStep === tourSteps.length - 1) ? "Finalizar Tour ✓" : "Siguiente ➡️";
     }
 
-    function navigateTour(direction) {
-      currentTourStep += direction;
-      if (currentTourStep >= tourSteps.length) {
-        closeTourModal();
-      } else if (currentTourStep < 0) {
-        currentTourStep = 0;
-      } else {
-        renderTourStep();
-      }
+    function navigateTour(dir) {
+      currentTourStep += dir;
+      if (currentTourStep >= tourSteps.length) closeTourModal();
+      else if (currentTourStep < 0) currentTourStep = 0;
+      else renderTourStep();
     }
 
     function closeTourModal() {
-      document.getElementById("interactive-tour-modal").classList.add("hidden");
+      document.querySelectorAll(".tour-spotlight-highlight").forEach(el => el.classList.remove("tour-spotlight-highlight"));
+      document.getElementById("tour-backdrop").classList.add("hidden");
+      document.getElementById("tour-popover").classList.add("hidden");
     }
 
-    function toggleAutoTourPreference(chk) {
-      if (chk.checked) {
-        localStorage.setItem("disable_mayorga_autotour", "true");
-      } else {
-        localStorage.removeItem("disable_mayorga_autotour");
-      }
+    // ----------------------------------------------------------------
+    // ARRASTRAR INSIGNIA CON EL MOUSE (DRAG AND DROP EN PREVIEW)
+    // ----------------------------------------------------------------
+    function initDragAndDropBadge() {
+      const previewContainer = document.getElementById("preview-box-container");
+      const badges = [document.getElementById("prev-badge-oferta"), document.getElementById("prev-badge-nuevo")];
+
+      badges.forEach(badge => {
+        let isDragging = false;
+
+        badge.addEventListener("mousedown", (e) => {
+          isDragging = true;
+          e.preventDefault();
+        });
+
+        window.addEventListener("mousemove", (e) => {
+          if (!isDragging || badge.classList.contains("hidden")) return;
+
+          const rect = previewContainer.getBoundingClientRect();
+          let posX = ((e.clientX - rect.left) / rect.width) * 100;
+          let posY = ((e.clientY - rect.top) / rect.height) * 100;
+
+          posX = Math.max(0, Math.min(80, Math.round(posX)));
+          posY = Math.max(0, Math.min(80, Math.round(posY)));
+
+          document.getElementById("badge-pos-x").value = posX;
+          document.getElementById("badge-pos-y").value = posY;
+
+          updateBadgeTransformations();
+        });
+
+        window.addEventListener("mouseup", () => {
+          if (isDragging) isDragging = false;
+        });
+      });
     }
 
     const sortableList = document.getElementById('product-list');
@@ -582,9 +634,7 @@
         const data = doc.data();
         activeGlobalFrame = data.activeFrame || "none";
         if (data.urls) FRAME_URLS = { ...FRAME_URLS, ...data.urls };
-      } else {
-        activeGlobalFrame = "none";
-      }
+      } else { activeGlobalFrame = "none"; }
       updateThemeFrameUI();
     });
 
@@ -593,23 +643,17 @@
       const isChecking = checkbox.checked;
       checkbox.checked = !isChecking;
 
-      const actionText = isChecking ? `¿Activar Marco de ${type.toUpperCase()}?` : `¿Desactivar Marco?`;
-      openModal(actionText, "Este cambio afectará a todas las Smart TV.", () => {
-        let nextFrame = "none";
-        if (isChecking) nextFrame = type;
-        return db.collection("configuracion").doc("marcos").set({
-          activeFrame: nextFrame,
-          urls: FRAME_URLS
-        }, { merge: true });
+      openModal(isChecking ? `¿Activar Marco de ${type.toUpperCase()}?` : `¿Desactivar Marco?`, "Afectará a todas las TV.", () => {
+        let nextFrame = isChecking ? type : "none";
+        return db.collection("configuracion").doc("marcos").set({ activeFrame: nextFrame, urls: FRAME_URLS }, { merge: true });
       });
     }
 
     async function uploadFrameImage(type, input) {
       if (!input.files || !input.files[0]) return;
       const file = input.files[0];
-
-      openModal(`¿Subir nuevo Marco para ${type.toUpperCase()}?`, "Reemplazará la imagen del marco anterior.", async () => {
-        showStatus("Subiendo nuevo marco PNG...");
+      openModal(`¿Subir nuevo Marco para ${type.toUpperCase()}?`, "Reemplazará el anterior.", async () => {
+        showStatus("Subiendo marco...");
         const formData = new FormData();
         formData.append("file", file);
         formData.append("upload_preset", CLOUDINARY_PRESET);
@@ -620,18 +664,14 @@
 
         FRAME_URLS[type] = data.secure_url;
         await db.collection("configuracion").doc("marcos").set({ urls: FRAME_URLS }, { merge: true });
-        showStatus("¡Marco actualizado correctamente!");
+        showStatus("¡Marco subido!");
       });
     }
 
     function updateThemeFrameUI() {
-      const isNavidad = activeGlobalFrame === "navidad";
-      const isPascuas = activeGlobalFrame === "pascuas";
-      const isGenerico = activeGlobalFrame === "generico";
-
-      document.getElementById("toggle-frame-navidad").checked = isNavidad;
-      document.getElementById("toggle-frame-pascuas").checked = isPascuas;
-      document.getElementById("toggle-frame-generico").checked = isGenerico;
+      document.getElementById("toggle-frame-navidad").checked = activeGlobalFrame === "navidad";
+      document.getElementById("toggle-frame-pascuas").checked = activeGlobalFrame === "pascuas";
+      document.getElementById("toggle-frame-generico").checked = activeGlobalFrame === "generico";
 
       const setStatus = (id, isActive) => {
         const el = document.getElementById(id);
@@ -639,23 +679,19 @@
         el.className = "status-pill " + (isActive ? "active" : "inactive");
       };
 
-      setStatus("status-frame-navidad", isNavidad);
-      setStatus("status-frame-pascuas", isPascuas);
-      setStatus("status-frame-generico", isGenerico);
-
+      setStatus("status-frame-navidad", activeGlobalFrame === "navidad");
+      setStatus("status-frame-pascuas", activeGlobalFrame === "pascuas");
+      setStatus("status-frame-generico", activeGlobalFrame === "generico");
       updatePreviewFrame();
     }
 
     function updatePreviewFrame() {
       const frameImg = document.getElementById("prev-theme-frame");
       const currentTitle = document.getElementById("prod-title").value.trim();
-
       if (activeGlobalFrame !== "none" && FRAME_URLS[activeGlobalFrame] && currentTitle !== "") {
         frameImg.src = FRAME_URLS[activeGlobalFrame];
         frameImg.classList.remove("hidden");
-      } else {
-        frameImg.classList.add("hidden");
-      }
+      } else { frameImg.classList.add("hidden"); }
     }
 
     function handleBadgeToggle(type) {
@@ -668,6 +704,25 @@
       updateBadgeUI();
     }
 
+    function updateBadgeTransformations() {
+      const scale = document.getElementById("badge-scale").value;
+      const posX = document.getElementById("badge-pos-x").value;
+      const posY = document.getElementById("badge-pos-y").value;
+
+      document.getElementById("val-badge-scale").textContent = `${scale}%`;
+      document.getElementById("val-badge-pos-x").textContent = `${posX}%`;
+      document.getElementById("val-badge-pos-y").textContent = `${posY}%`;
+
+      const prevOferta = document.getElementById("prev-badge-oferta");
+      const prevNuevo = document.getElementById("prev-badge-nuevo");
+
+      [prevOferta, prevNuevo].forEach(badge => {
+        badge.style.width = `${scale}%`;
+        badge.style.left = `${posX}%`;
+        badge.style.top = `${posY}%`;
+      });
+    }
+
     function updateBadgeUI() {
       const isOferta = document.getElementById("prod-show-oferta").checked;
       const isNuevo = document.getElementById("prod-show-nuevo").checked;
@@ -678,6 +733,10 @@
       const prevNuevo = document.getElementById("prev-badge-nuevo");
       const legalBanner = document.getElementById("prev-legal-banner");
       const dateContainer = document.getElementById("oferta-date-container");
+      const controlsBox = document.getElementById("badge-controls-box");
+
+      const hasAnyBadge = isOferta || isNuevo;
+      controlsBox.classList.toggle("hidden", !hasAnyBadge);
 
       tagOferta.textContent = isOferta ? "ACTIVADA" : "DESACTIVADA";
       tagOferta.className = "status-pill " + (isOferta ? "active" : "inactive");
@@ -690,6 +749,7 @@
       legalBanner.classList.toggle("hidden", !isOferta);
       dateContainer.classList.toggle("hidden", !isOferta);
 
+      updateBadgeTransformations();
       if (isOferta) updateLegalBannerText();
     }
 
@@ -743,16 +803,8 @@
 
         if (count > 0) {
           let avgR = Math.round(rSum / count), avgG = Math.round(gSum / count), avgB = Math.round(bSum / count);
-          let titleR = Math.min(255, Math.max(80, avgR + 60));
-          let titleG = Math.min(255, Math.max(140, avgG + 60));
-          let titleB = Math.min(255, Math.max(180, avgB + 80));
-          let hexTitle = `#${((1 << 24) + (titleR << 16) + (titleG << 8) + titleB).toString(16).slice(1)}`;
-
-          let volR = Math.min(255, Math.max(200, 255 - avgR));
-          let volG = Math.min(255, Math.max(180, 255 - avgG));
-          let volB = Math.min(180, Math.max(50, avgB / 2));
-          let hexVol = `#${((1 << 24) + (volR << 16) + (volG << 8) + volB).toString(16).slice(1)}`;
-
+          let hexTitle = `#${((1 << 24) + (Math.min(255, avgR + 60) << 16) + (Math.min(255, avgG + 60) << 8) + Math.min(255, avgB + 80)).toString(16).slice(1)}`;
+          let hexVol = `#${((1 << 24) + (Math.min(255, 255 - avgR) << 16) + (Math.min(255, 255 - avgG) << 8) + Math.min(180, avgB / 2)).toString(16).slice(1)}`;
           setPreviewColors(hexTitle, hexVol);
         }
       } catch (e) {
@@ -771,14 +823,10 @@
         reader.onload = function(e) {
           placeholder.style.display = "none";
           if (file.type.startsWith("video/")) {
-            bgImg.style.display = "none";
-            bgVid.src = e.target.result;
-            bgVid.style.display = "block";
+            bgImg.style.display = "none"; bgVid.src = e.target.result; bgVid.style.display = "block";
             bgVid.onloadeddata = () => extractColorsFromMedia(bgVid);
           } else {
-            bgVid.style.display = "none";
-            bgImg.src = e.target.result;
-            bgImg.style.display = "block";
+            bgVid.style.display = "none"; bgImg.src = e.target.result; bgImg.style.display = "block";
             bgImg.onload = () => extractColorsFromMedia(bgImg);
           }
         }
@@ -793,8 +841,6 @@
         productosList.sort((a, b) => (a.orden ?? 0) - (b.orden ?? 0));
         renderProductList();
         updateMarketingMetrics();
-      }, err => {
-        showStatus("Error al cargar productos: " + err.message, true);
       });
     }
 
@@ -802,26 +848,14 @@
       const activeProducts = productosList.filter(p => p.activo !== false);
       const totalCount = activeProducts.length;
       const totalSeconds = totalCount * 7;
-      const mins = Math.floor(totalSeconds / 60);
-      const secs = totalSeconds % 60;
-
       document.getElementById("metric-total-slides").textContent = totalCount;
-      document.getElementById("metric-total-time").textContent = `${mins} min ${secs} sec`;
-
-      const tipBox = document.getElementById("marketing-tip-box");
-      if (totalCount < 5) {
-        tipBox.innerHTML = `⚠️ <strong>Pocas imágenes en rotación (${totalCount}):</strong> Se recomienda agregar al menos 8 a 10 productos para evitar repetición en caja.`;
-      } else if (totalCount >= 5 && totalCount <= 12) {
-        tipBox.innerHTML = `✅ <strong>Cantidad Óptima (${totalCount} ofertas):</strong> El ciclo dura ${totalSeconds}s, ideal para captar la atención de los clientes.`;
-      } else {
-        tipBox.innerHTML = `💡 <strong>Atención (${totalCount} ofertas):</strong> El ciclo supera el minuto y medio. Considera desactivar ofertas secundarias.`;
-      }
+      document.getElementById("metric-total-time").textContent = `${Math.floor(totalSeconds / 60)} min ${totalSeconds % 60} sec`;
     }
 
     function renderProductList() {
       sortableList.innerHTML = "";
       if (productosList.length === 0) {
-        sortableList.innerHTML = `<li style="color: #94a3b8; text-align: center; padding: 20px;">No hay ofertas cargadas todavía.</li>`;
+        sortableList.innerHTML = `<li style="color: #94a3b8; text-align: center; padding: 20px;">No hay ofertas cargadas.</li>`;
         return;
       }
 
@@ -840,7 +874,7 @@
         if (p.showNuevoBadge) badgeTag = `<span style="background:#0284c7; color:#bae6fd; font-size:10px; padding:2px 5px; border-radius:4px; font-weight:bold;">✨ NUEVO</span>`;
 
         li.innerHTML = `
-          <div class="drag-handle" title="Arrastrar para reordenar">☰</div>
+          <div class="drag-handle">☰</div>
           <div class="order-number">#${index + 1}</div>
           <div class="product-info">
             ${thumbMedia}
@@ -850,7 +884,7 @@
             </div>
           </div>
           <div class="action-buttons">
-            <label class="switch" title="Activar/Desactivar">
+            <label class="switch">
               <input type="checkbox" ${p.activo !== false ? 'checked' : ''} onchange="requestToggleActive('${p.id}', this.checked)">
               <span class="slider"></span>
             </label>
@@ -878,6 +912,10 @@
       document.getElementById("prod-price-dec").value = prod.precioDecimal || "00";
       document.getElementById("prod-date").value = prod.fechaProgramada || "";
       document.getElementById("prod-oferta-end-date").value = prod.fechaFinOferta || "";
+
+      document.getElementById("badge-scale").value = prod.badgeScale || "20";
+      document.getElementById("badge-pos-x").value = prod.badgePosX || "8";
+      document.getElementById("badge-pos-y").value = prod.badgePosY || "5";
 
       document.getElementById("prod-show-oferta").checked = prod.showOfertaBadge === true;
       document.getElementById("prod-show-nuevo").checked = prod.showNuevoBadge === true;
@@ -910,10 +948,12 @@
       document.getElementById("product-form").reset();
       document.getElementById("prod-show-oferta").checked = false;
       document.getElementById("prod-show-nuevo").checked = false;
+      document.getElementById("badge-scale").value = "20";
+      document.getElementById("badge-pos-x").value = "8";
+      document.getElementById("badge-pos-y").value = "5";
       updateBadgeUI();
 
       document.getElementById("form-header-title").textContent = "Cargar Nueva Oferta";
-      document.getElementById("img-label").textContent = "Imagen o Video MP4 del Producto";
       document.getElementById("btn-submit").textContent = "Publicar Oferta";
       document.getElementById("btn-cancel").classList.add("hidden");
 
@@ -960,30 +1000,15 @@
       openModal(editingProductId ? "¿Guardar Cambios?" : "¿Publicar Oferta?", "Se actualizarán las pantallas de las TV.", processUpload);
     }
 
-    function requestSaveOrder() {
-      openModal("¿Guardar Nuevo Orden?", "El nuevo orden cambiará en vivo.", processSaveOrder);
-    }
-
-    function requestToggleActive(id, newState) {
-      openModal(`¿${newState ? 'Activar' : 'Desactivar'} Producto?`, `El producto ${newState ? 'se mostrará' : 'se ocultará'}.`, () => {
-        return db.collection("productos").doc(id).update({ activo: newState });
-      });
-    }
-
-    function requestDelete(id) {
-      openModal("¿ELIMINAR PRODUCTO?", "Esta acción eliminará la placa.", () => {
-        return db.collection("productos").doc(id).delete();
-      });
-    }
+    function requestSaveOrder() { openModal("¿Guardar Nuevo Orden?", "El nuevo orden cambiará en vivo.", processSaveOrder); }
+    function requestToggleActive(id, newState) { openModal(`¿${newState ? 'Activar' : 'Desactivar'} Producto?`, "", () => db.collection("productos").doc(id).update({ activo: newState })); }
+    function requestDelete(id) { openModal("¿ELIMINAR PRODUCTO?", "", () => db.collection("productos").doc(id).delete()); }
 
     async function processSaveOrder() {
       showStatus("Guardando nuevo orden...");
       const batch = db.batch();
-      const items = Array.from(sortableList.children);
-      items.forEach((li, index) => {
-        if(li.dataset.id) {
-          batch.update(db.collection("productos").doc(li.dataset.id), { orden: index });
-        }
+      Array.from(sortableList.children).forEach((li, index) => {
+        if(li.dataset.id) batch.update(db.collection("productos").doc(li.dataset.id), { orden: index });
       });
       await batch.commit();
       showStatus("¡Orden actualizado!");
@@ -1002,17 +1027,12 @@
           const isVideo = file.type.startsWith("video/");
           detectedType = isVideo ? "video" : "image";
 
-          showStatus(isVideo ? "Subiendo video MP4..." : "Subiendo imagen...");
           const formData = new FormData();
           formData.append("file", file);
           formData.append("upload_preset", CLOUDINARY_PRESET);
 
-          const endpoint = isVideo 
-            ? `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/video/upload`
-            : `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`;
-
-          const res = await fetch(endpoint, { method: "POST", body: formData });
-          if (!res.ok) throw new Error("Error en subida de archivo");
+          const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/${isVideo ? 'video' : 'image'}/upload`, { method: "POST", body: formData });
+          if (!res.ok) throw new Error("Error al subir archivo");
           const data = await res.json();
           finalImageUrl = isVideo ? data.secure_url : data.secure_url.replace('/upload/', '/upload/w_1280,f_auto,q_auto/');
         }
@@ -1024,6 +1044,9 @@
           tipoMedia: detectedType,
           showOfertaBadge: document.getElementById("prod-show-oferta").checked,
           showNuevoBadge: document.getElementById("prod-show-nuevo").checked,
+          badgeScale: document.getElementById("badge-scale").value,
+          badgePosX: document.getElementById("badge-pos-x").value,
+          badgePosY: document.getElementById("badge-pos-y").value,
           fechaFinOferta: document.getElementById("prod-oferta-end-date").value || null,
           titulo: rawTitle ? rawTitle.toUpperCase() : "",
           subtitulo: document.getElementById("prod-sub").value.toUpperCase(),
@@ -1049,27 +1072,21 @@
 
         cancelEditing();
         closeModal();
-      } catch (err) {
-        showStatus("Error: " + err.message, true);
-      }
+      } catch (err) { showStatus("Error: " + err.message, true); }
     }
 
-    // ANIMACIÓN CANVAS PARTÍCULAS
+    // CANVAS DE FONDO
     const canvas = document.getElementById('futuristic-bg');
     const ctx = canvas.getContext('2d');
     let particles = [];
-    const particleCount = 50;
-
     function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
     window.addEventListener('resize', resizeCanvas);
     resizeCanvas();
 
     class Particle {
       constructor() {
-        this.x = Math.random() * canvas.width;
-        this.y = Math.random() * canvas.height;
-        this.vx = (Math.random() - 0.5) * 0.8;
-        this.vy = (Math.random() - 0.5) * 0.8;
+        this.x = Math.random() * canvas.width; this.y = Math.random() * canvas.height;
+        this.vx = (Math.random() - 0.5) * 0.8; this.vy = (Math.random() - 0.5) * 0.8;
         this.radius = Math.random() * 2 + 1;
       }
       update() {
@@ -1079,38 +1096,21 @@
       }
       draw() {
         ctx.beginPath(); ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-        ctx.fillStyle = '#38bdf8'; ctx.shadowBlur = 6; ctx.shadowColor = '#0284c7'; ctx.fill();
+        ctx.fillStyle = '#38bdf8'; ctx.fill();
       }
     }
-
-    for (let i = 0; i < particleCount; i++) particles.push(new Particle());
+    for (let i = 0; i < 50; i++) particles.push(new Particle());
 
     function animate() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       for (let i = 0; i < particles.length; i++) {
-        particles[i].update();
-        particles[i].draw();
-        for (let j = i + 1; j < particles.length; j++) {
-          const dx = particles[i].x - particles[j].x;
-          const dy = particles[i].y - particles[j].y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist < 130) {
-            ctx.beginPath(); ctx.moveTo(particles[i].x, particles[i].y);
-            ctx.lineTo(particles[j].x, particles[j].y);
-            ctx.strokeStyle = `rgba(56, 189, 248, ${1 - dist / 130})`;
-            ctx.lineWidth = 0.4; ctx.stroke();
-          }
-        }
+        particles[i].update(); particles[i].draw();
       }
       requestAnimationFrame(animate);
     }
     animate();
 
-    // AUTO-ARRANQUE DEL TOUR SI NO FUE DESACTIVADO
-    if (localStorage.getItem("disable_mayorga_autotour") !== "true") {
-      setTimeout(() => startGuidedTour(0), 600);
-    }
-
+    initDragAndDropBadge();
     loadProductsFromFirebase();
   </script>
 </body>
