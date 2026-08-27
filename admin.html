@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Panel de Control - Los Mayorga TV</title>
 
-  <!-- Tipografías de las TV para previsualización idéntica -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Roboto+Condensed:wght@700;900&display=swap" rel="stylesheet">
@@ -19,7 +18,6 @@
     body { background: #0f172a; color: #f8fafc; padding: 20px; display: flex; justify-content: center; }
     .container { width: 100%; max-width: 1100px; }
     
-    /* Layout principal con Grid para Formulario y Previsualización */
     .admin-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 25px; }
     @media (max-width: 900px) { .admin-grid { grid-template-columns: 1fr; } }
 
@@ -43,7 +41,6 @@
     .btn-danger { background: #dc2626; color: #fff; font-size: 13px; padding: 6px 12px; }
     .btn-logout { background: #475569; color: #fff; font-size: 13px; padding: 8px 14px; }
 
-    /* ESTILOS DE LA PREVISUALIZACIÓN EN VIVO (Simulador de TV 16:9) */
     .preview-container {
       position: relative;
       width: 100%;
@@ -88,7 +85,7 @@
       display: flex;
       flex-direction: column;
       justify-content: center;
-      padding-left: 4%;
+      padding-left: 10%;
       color: #fff;
       text-transform: uppercase;
     }
@@ -100,6 +97,7 @@
       line-height: 0.85;
       text-shadow: 2px 2px 8px rgba(0,0,0,0.9);
       word-break: break-word;
+      transition: color 0.3s ease;
     }
 
     .preview-subtitle {
@@ -122,6 +120,7 @@
       color: #fef08a;
       line-height: 0.8;
       text-shadow: 2px 2px 8px rgba(0,0,0,0.9);
+      transition: color 0.3s ease;
     }
 
     .preview-pack {
@@ -135,7 +134,7 @@
 
     .preview-price {
       position: absolute;
-      bottom: 8%;
+      bottom: 22%;
       right: 6%;
       z-index: 3;
       background-color: #fff;
@@ -156,7 +155,6 @@
       margin-left: 2px;
     }
 
-    /* Lista y Drag & Drop */
     .product-list { list-style: none; }
     .product-item { background: #334155; padding: 15px; border-radius: 8px; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; gap: 15px; cursor: grab; }
     .product-item:active { cursor: grabbing; }
@@ -190,7 +188,7 @@
   <div class="container">
     
     <div class="admin-grid">
-      <!-- COLUMNA 1: FORMULARIO -->
+      <!-- FORMULARIO -->
       <div class="card">
         <div class="header-bar">
           <h2 id="form-header-title">Cargar Nueva Oferta</h2>
@@ -199,8 +197,8 @@
 
         <form id="product-form">
           <div class="form-group">
-            <label id="img-label">Imagen del Producto</label>
-            <input type="file" id="prod-img" accept="image/*" onchange="updatePreviewImg(this)">
+            <label id="img-label">Imagen o Video MP4 del Producto</label>
+            <input type="file" id="prod-img" accept="image/*,video/mp4" onchange="updatePreviewMedia(this)">
           </div>
           <div class="row">
             <div class="form-group">
@@ -243,14 +241,15 @@
         <div id="status" class="hidden"></div>
       </div>
 
-      <!-- COLUMNA 2: PREVISUALIZACIÓN EN VIVO (SIMULADOR SMART TV) -->
+      <!-- PREVISUALIZACIÓN -->
       <div class="card">
         <h2>Vista Previa en Vivo (Smart TV)</h2>
         <p style="font-size: 13px; color: #94a3b8; margin-bottom: 15px;">Así es como se proyectará esta oferta exactamente en los televisores del local.</p>
         
         <div class="preview-container">
-          <div id="prev-placeholder" class="preview-placeholder">Selecciona una imagen para ver la vista previa</div>
-          <img id="prev-bg" class="preview-bg">
+          <div id="prev-placeholder" class="preview-placeholder">Selecciona una imagen o video MP4 para ver la vista previa</div>
+          <img id="prev-bg" class="preview-bg" crossorigin="anonymous">
+          <video id="prev-video" class="preview-bg" autoplay loop muted playsinline></video>
           
           <div class="preview-overlay">
             <div id="prev-title" class="preview-title">CERVEZA</div>
@@ -268,7 +267,7 @@
       </div>
     </div>
 
-    <!-- LISTA DE PRODUCTOS Y REORDENAR -->
+    <!-- LISTA DE PRODUCTOS -->
     <div class="card">
       <h2>Productos en Pantalla</h2>
       <p style="font-size: 13px; color: #94a3b8; margin-bottom: 15px;">Arrastra las tarjetas para cambiar el orden de reproducción en las Smart TV.</p>
@@ -278,7 +277,7 @@
     </div>
   </div>
 
-  <!-- MODALES DE CONFIRMACIÓN -->
+  <!-- MODALES CONFIRMACIÓN -->
   <div id="modal-confirm" class="modal-overlay hidden">
     <div class="modal-box">
       <h3 id="modal-title">¿Estás seguro?</h3>
@@ -311,7 +310,6 @@
       window.location.href = "login.html";
     }
 
-    // CLOUDINARY Y FIREBASE
     const CLOUDINARY_CLOUD_NAME = "aibqthzz"; 
     const CLOUDINARY_PRESET = "losmayorgatv";
 
@@ -330,13 +328,16 @@
 
     let productosList = [];
     let pendingAction = null;
-    let editingProductId = null; // ID del producto en edición
-    let currentExistingImageUrl = ""; // Guarda la URL de imagen actual si no se sube una nueva
+    let editingProductId = null;
+    let currentExistingImageUrl = "";
+    let currentExistingMediaType = "image";
+    
+    let detectedColorTitle = "#38bdf8";
+    let detectedColorVol = "#fef08a";
 
     const sortableList = document.getElementById('product-list');
     new Sortable(sortableList, { animation: 150 });
 
-    // PREVISUALIZACIÓN EN VIVO
     function updatePreviewText() {
       document.getElementById("prev-title").textContent = (document.getElementById("prod-title").value || "TÍTULO").toUpperCase();
       document.getElementById("prev-sub").textContent = (document.getElementById("prod-sub").value || "SUBTÍTULO").toUpperCase();
@@ -346,16 +347,86 @@
       document.getElementById("prev-price-dec").textContent = document.getElementById("prod-price-dec").value || "00";
     }
 
-    function updatePreviewImg(input) {
+    function setPreviewColors(colorTitle, colorVol) {
+      detectedColorTitle = colorTitle;
+      detectedColorVol = colorVol;
+      document.getElementById("prev-title").style.color = colorTitle;
+      document.getElementById("prev-vol").style.color = colorVol;
+    }
+
+    function updatePreviewMedia(input) {
       if (input.files && input.files[0]) {
+        const file = input.files[0];
+        const bgImg = document.getElementById("prev-bg");
+        const bgVid = document.getElementById("prev-video");
+        const placeholder = document.getElementById("prev-placeholder");
+
         const reader = new FileReader();
         reader.onload = function(e) {
-          const bg = document.getElementById("prev-bg");
-          bg.src = e.target.result;
-          bg.style.display = "block";
-          document.getElementById("prev-placeholder").style.display = "none";
+          placeholder.style.display = "none";
+
+          if (file.type.startsWith("video/")) {
+            bgImg.style.display = "none";
+            bgVid.src = e.target.result;
+            bgVid.style.display = "block";
+            setPreviewColors("#38bdf8", "#fef08a");
+          } else {
+            bgVid.style.display = "none";
+            bgImg.src = e.target.result;
+            bgImg.style.display = "block";
+
+            bgImg.onload = function() {
+              extractColorsFromImage(bgImg);
+            };
+          }
         }
-        reader.readAsDataURL(input.files[0]);
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function extractColorsFromImage(imgElement) {
+      try {
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+        canvas.width = 100;
+        canvas.height = 100;
+        ctx.drawImage(imgElement, 0, 0, 100, 100);
+
+        const imgData = ctx.getImageData(0, 0, 100, 100).data;
+        let rSum = 0, gSum = 0, bSum = 0, count = 0;
+
+        for (let i = 0; i < imgData.length; i += 16) {
+          const r = imgData[i];
+          const g = imgData[i+1];
+          const b = imgData[i+2];
+          
+          if ((r + g + b) > 60 && (r + g + b) < 700) {
+            rSum += r;
+            gSum += g;
+            bSum += b;
+            count++;
+          }
+        }
+
+        if (count > 0) {
+          let avgR = Math.round(rSum / count);
+          let avgG = Math.round(gSum / count);
+          let avgB = Math.round(bSum / count);
+
+          let titleR = Math.min(255, Math.max(80, avgR + 60));
+          let titleG = Math.min(255, Math.max(140, avgG + 60));
+          let titleB = Math.min(255, Math.max(180, avgB + 80));
+          let hexTitle = `#${((1 << 24) + (titleR << 16) + (titleG << 8) + titleB).toString(16).slice(1)}`;
+
+          let volR = Math.min(255, Math.max(200, 255 - avgR));
+          let volG = Math.min(255, Math.max(180, 255 - avgG));
+          let volB = Math.min(180, Math.max(50, avgB / 2));
+          let hexVol = `#${((1 << 24) + (volR << 16) + (volG << 8) + volB).toString(16).slice(1)}`;
+
+          setPreviewColors(hexTitle, hexVol);
+        }
+      } catch (e) {
+        setPreviewColors("#38bdf8", "#fef08a");
       }
     }
 
@@ -385,11 +456,16 @@
         li.className = "product-item";
         li.dataset.id = p.id;
 
+        const isVideo = p.tipoMedia === "video";
+        const thumbMedia = isVideo 
+          ? `<video src="${p.imagenUrl}" class="product-thumb" muted></video>` 
+          : `<img src="${p.imagenUrl}" class="product-thumb">`;
+
         li.innerHTML = `
           <div class="product-info">
-            <img src="${p.imagenUrl}" class="product-thumb">
+            ${thumbMedia}
             <div class="product-details">
-              <h4>${p.titulo} - $${p.precioEntero}</h4>
+              <h4>${p.titulo} - $${p.precioEntero} ${isVideo ? '📹 (Video)' : ''}</h4>
               <p>${p.subtitulo || ''} ${p.fechaProgramada ? '| 🕒 Prog: ' + p.fechaProgramada.replace('T', ' ') : ''}</p>
             </div>
           </div>
@@ -408,15 +484,14 @@
       });
     }
 
-    // MODALIDAD EDICIÓN DE OFERTAS
     function startEditing(id) {
       const prod = productosList.find(p => p.id === id);
       if (!prod) return;
 
       editingProductId = id;
       currentExistingImageUrl = prod.imagenUrl;
+      currentExistingMediaType = prod.tipoMedia || "image";
 
-      // Cargar formulario
       document.getElementById("prod-title").value = prod.titulo || "";
       document.getElementById("prod-sub").value = prod.subtitulo || "";
       document.getElementById("prod-vol").value = prod.volumen || "";
@@ -425,36 +500,46 @@
       document.getElementById("prod-price-dec").value = prod.precioDecimal || "00";
       document.getElementById("prod-date").value = prod.fechaProgramada || "";
 
-      // Ajustes interfaz
-      document.getElementById("form-header-title").textContent = "Editar Oferta Existent";
-      document.getElementById("img-label").textContent = "Cambiar Imagen (Opcional - Dejar vacío para conservar la actual)";
+      document.getElementById("form-header-title").textContent = "Editar Oferta Existente";
+      document.getElementById("img-label").textContent = "Cambiar Archivo (Opcional - Dejar vacío para conservar)";
       document.getElementById("btn-submit").textContent = "Guardar Cambios";
       document.getElementById("btn-cancel").classList.remove("hidden");
 
-      // Cargar imagen en vista previa
-      const bg = document.getElementById("prev-bg");
-      bg.src = prod.imagenUrl;
-      bg.style.display = "block";
+      const bgImg = document.getElementById("prev-bg");
+      const bgVid = document.getElementById("prev-video");
       document.getElementById("prev-placeholder").style.display = "none";
 
+      if (currentExistingMediaType === "video") {
+        bgImg.style.display = "none";
+        bgVid.src = prod.imagenUrl;
+        bgVid.style.display = "block";
+      } else {
+        bgVid.style.display = "none";
+        bgImg.src = prod.imagenUrl;
+        bgImg.style.display = "block";
+      }
+
+      setPreviewColors(prod.colorTitulo || "#38bdf8", prod.colorVolumen || "#fef08a");
       updatePreviewText();
 
-      // Desplazarse arriba suavemente
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     function cancelEditing() {
       editingProductId = null;
       currentExistingImageUrl = "";
+      currentExistingMediaType = "image";
 
       document.getElementById("product-form").reset();
       document.getElementById("form-header-title").textContent = "Cargar Nueva Oferta";
-      document.getElementById("img-label").textContent = "Imagen del Producto";
+      document.getElementById("img-label").textContent = "Imagen o Video MP4 del Producto";
       document.getElementById("btn-submit").textContent = "Publicar Oferta";
       document.getElementById("btn-cancel").classList.add("hidden");
 
       document.getElementById("prev-bg").style.display = "none";
+      document.getElementById("prev-video").style.display = "none";
       document.getElementById("prev-placeholder").style.display = "flex";
+      setPreviewColors("#38bdf8", "#fef08a");
       updatePreviewText();
     }
 
@@ -491,7 +576,7 @@
     function requestUpload() {
       const fileInput = document.getElementById("prod-img");
       if (!editingProductId && !fileInput.files[0]) {
-        return alert("Selecciona una imagen para crear la oferta");
+        return alert("Selecciona un archivo de imagen o video MP4");
       }
 
       const actionText = editingProductId ? "¿Guardar Cambios?" : "¿Publicar Oferta?";
@@ -541,26 +626,40 @@
       try {
         const fileInput = document.getElementById("prod-img");
         let finalImageUrl = currentExistingImageUrl;
+        let detectedType = currentExistingMediaType;
 
-        // Si se seleccionó una foto nueva, subirla a Cloudinary
         if (fileInput.files && fileInput.files[0]) {
-          showStatus("Subiendo nueva imagen optimizada...");
+          const file = fileInput.files[0];
+          const isVideo = file.type.startsWith("video/");
+          detectedType = isVideo ? "video" : "image";
+
+          showStatus(isVideo ? "Subiendo video MP4 a Cloudinary..." : "Subiendo imagen a Cloudinary...");
+          
           const formData = new FormData();
-          formData.append("file", fileInput.files[0]);
+          formData.append("file", file);
           formData.append("upload_preset", CLOUDINARY_PRESET);
 
-          const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`, {
+          // URL de subida dinámica según si es video o foto
+          const endpoint = isVideo 
+            ? `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/video/upload`
+            : `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`;
+
+          const res = await fetch(endpoint, {
             method: "POST",
             body: formData
           });
 
-          if (!res.ok) throw new Error("Error al subir la imagen a Cloudinary");
+          if (!res.ok) throw new Error("Error al subir el archivo a Cloudinary");
           const data = await res.json();
-          finalImageUrl = data.secure_url.replace('/upload/', '/upload/w_1280,f_auto,q_auto/');
+          
+          finalImageUrl = isVideo 
+            ? data.secure_url 
+            : data.secure_url.replace('/upload/', '/upload/w_1280,f_auto,q_auto/');
         }
 
         const payload = {
           imagenUrl: finalImageUrl,
+          tipoMedia: detectedType,
           titulo: document.getElementById("prod-title").value.toUpperCase(),
           subtitulo: document.getElementById("prod-sub").value.toUpperCase(),
           volumen: document.getElementById("prod-vol").value.toUpperCase(),
@@ -568,14 +667,14 @@
           precioEntero: document.getElementById("prod-price-int").value,
           precioDecimal: document.getElementById("prod-price-dec").value || "00",
           fechaProgramada: document.getElementById("prod-date").value || null,
+          colorTitulo: detectedColorTitle,
+          colorVolumen: detectedColorVol
         };
 
         if (editingProductId) {
-          // Actualización de producto existente
           await db.collection("productos").doc(editingProductId).update(payload);
           showStatus("¡Oferta actualizada exitosamente!");
         } else {
-          // Creación de nuevo producto
           payload.activo = true;
           payload.orden = productosList.length;
           payload.createdAt = firebase.firestore.FieldValue.serverTimestamp();
