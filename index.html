@@ -6,7 +6,6 @@
   <title>Vidriera Digital - Los Mayorga TV</title>
 
   <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700;900&family=Roboto+Condensed:wght@700;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
 
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
@@ -15,138 +14,71 @@
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html, body { width: 100vw; height: 100vh; background-color: #000; overflow: hidden; cursor: none; font-family: 'Oswald', sans-serif; }
     #slider-container { position: relative; width: 100vw; height: 100vh; }
-    .slide { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none; }
-    .slide.active { display: block; z-index: 10; }
+    
+    /* TRANSICIÓN CROSSFADE SUAVE Y ELEGANTE (SIN PANTALLA NEGRA) */
+    .slide {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      opacity: 0;
+      transition: opacity 1.5s ease-in-out;
+      z-index: 1;
+    }
+
+    .slide.active {
+      opacity: 1;
+      z-index: 2;
+    }
+
     .bg-image { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; }
     
-    /* BADGE OFERTA 3D EN SMART TV (50% MÁS PEQUEÑO Y MÁS ARRIBA) */
+    /* BADGES */
     .badge-oferta-3d {
       position: absolute;
-      top: 4vh;
-      left: 10vw;
-      z-index: 10;
+      top: 4vh; left: 10vw; z-index: 10;
       background: linear-gradient(180deg, #ffe600 0%, #ff8800 50%, #d90000 100%);
-      color: #fff;
-      font-weight: 900;
-      font-size: 1.8vw; /* Reducido un 50% */
-      padding: 0.1vw 0.6vw;
-      border-radius: 0.3vw;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      border: 0.15vw solid #fff;
-      box-shadow: 0 5px 10px rgba(0,0,0,0.8), inset 0 2px 2px rgba(255,255,255,0.7);
-      text-shadow: 2px 2px 0px #700000;
-      display: flex;
-      align-items: center;
-      gap: 0.4vw;
-      transform: rotate(-3deg);
+      color: #fff; font-weight: 900; font-size: 1.8vw; padding: 0.1vw 0.6vw; border-radius: 0.3vw;
+      text-transform: uppercase; border: 0.15vw solid #fff; box-shadow: 0 5px 10px rgba(0,0,0,0.8);
+      text-shadow: 2px 2px 0px #700000; display: flex; align-items: center; gap: 0.4vw; transform: rotate(-3deg);
     }
 
-    .fire-icon {
-      display: inline-block;
-      animation: flameAnim 0.8s infinite alternate ease-in-out;
-    }
-
-    @keyframes flameAnim {
-      0% { transform: scale(1) rotate(-5deg); filter: drop-shadow(0 0 2px #ff3300); }
-      100% { transform: scale(1.2) rotate(5deg); filter: drop-shadow(0 0 8px #ffff00); }
-    }
-
-    /* BANNER LEGAL EN MARGEN INFERIOR IZQUIERDO EN SMART TV */
-    .preview-legal-banner {
+    .badge-nuevo-3d {
       position: absolute;
-      bottom: 8vh;
-      left: 10vw;
-      z-index: 10;
-      background: #dc2626;
-      color: #ffffff;
-      font-family: system-ui, -apple-system, sans-serif;
-      font-size: 1.1vw;
-      font-weight: 800;
-      padding: 0.4vw 1vw;
-      border-radius: 0.3vw;
-      letter-spacing: 0.5px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.8);
-      max-width: 42vw;
-      line-height: 1.1;
-      text-transform: uppercase;
+      top: 4vh; left: 10vw; z-index: 10;
+      background: linear-gradient(180deg, #38bdf8 0%, #0284c7 50%, #1e3a8a 100%);
+      color: #fff; font-weight: 900; font-size: 1.8vw; padding: 0.1vw 0.6vw; border-radius: 0.3vw;
+      text-transform: uppercase; border: 0.15vw solid #fff; box-shadow: 0 5px 10px rgba(0,0,0,0.8);
+      text-shadow: 2px 2px 0px #0369a1; display: flex; align-items: center; gap: 0.4vw; transform: rotate(-3deg);
+    }
+
+    .fire-icon { display: inline-block; animation: flameAnim 0.8s infinite alternate ease-in-out; }
+    @keyframes flameAnim { 0% { transform: scale(1); } 100% { transform: scale(1.2); } }
+
+    .preview-legal-banner {
+      position: absolute; bottom: 8vh; left: 10vw; z-index: 10;
+      background: #dc2626; color: #ffffff; font-family: system-ui, sans-serif;
+      font-size: 1.1vw; font-weight: 800; padding: 0.4vw 1vw; border-radius: 0.3vw;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.8); max-width: 42vw; line-height: 1.1; text-transform: uppercase;
     }
 
     .overlay-content { 
-      position: absolute; 
-      top: 0; 
-      left: 0; 
-      width: 55%; 
-      height: 100%; 
-      z-index: 2; 
-      display: flex; 
-      flex-direction: column; 
-      justify-content: center; 
-      padding-left: 10vw; 
-      color: #fff; 
-      text-transform: uppercase; 
+      position: absolute; top: 0; left: 0; width: 55%; height: 100%; z-index: 2; 
+      display: flex; flex-direction: column; justify-content: center; padding-left: 10vw; color: #fff; text-transform: uppercase; 
     }
     
-    .title-main { 
-      font-size: 8.5vw; 
-      font-weight: 700; 
-      line-height: 0.85; 
-      text-shadow: 0 0.5vw 2vw rgba(0,0,0,0.95), 0 0.2vw 0.8vw rgba(0,0,0,0.85); 
-    }
-    
-    .subtitle { 
-      font-size: 2.3vw; 
-      font-weight: 700;
-      color: #ffffff; 
-      margin-top: 8px; 
-      text-shadow: 0 0.4vw 1.5vw rgba(0,0,0,0.95), 0 0.1vw 0.5vw rgba(0,0,0,0.9); 
-    }
-    
-    .details-row { 
-      display: flex; 
-      align-items: baseline; 
-      gap: 1.5vw; 
-      margin-top: 10px; 
-    }
-    
-    .volume { 
-      font-size: 8vw; 
-      font-weight: 700; 
-      line-height: 0.8; 
-      text-shadow: 0 0.5vw 2vw rgba(0,0,0,0.95), 0 0.2vw 0.8vw rgba(0,0,0,0.85); 
-    }
-    
-    .pack-info { 
-      font-size: 3vw; 
-      font-weight: 700; 
-      color: #ffffff; 
-      line-height: 0.95; 
-      max-width: 15vw; 
-      text-shadow: 0 0.4vw 1.5vw rgba(0,0,0,0.95), 0 0.1vw 0.5vw rgba(0,0,0,0.9); 
-    }
+    .title-main { font-size: 8.5vw; font-weight: 700; line-height: 0.85; text-shadow: 0 0.5vw 2vw rgba(0,0,0,0.95); }
+    .subtitle { font-size: 2.3vw; font-weight: 700; color: #ffffff; margin-top: 8px; text-shadow: 0 0.4vw 1.5vw rgba(0,0,0,0.95); }
+    .details-row { display: flex; align-items: baseline; gap: 1.5vw; margin-top: 10px; }
+    .volume { font-size: 8vw; font-weight: 700; line-height: 0.8; text-shadow: 0 0.5vw 2vw rgba(0,0,0,0.95); }
+    .pack-info { font-size: 3vw; font-weight: 700; color: #ffffff; line-height: 0.95; max-width: 15vw; text-shadow: 0 0.4vw 1.5vw rgba(0,0,0,0.95); }
     
     .price-override { 
-      position: absolute; 
-      bottom: 18vh; 
-      right: 4vw; 
-      z-index: 3; 
-      background-color: #fff; 
-      padding: 0.5vw 2vw; 
-      font-family: 'Roboto Condensed', sans-serif; 
-      color: #000; 
-      font-size: 5.5vw; 
-      font-weight: 900; 
-      display: flex; 
-      align-items: flex-start; 
-      box-shadow: 0 10px 25px rgba(0,0,0,0.5); 
-      border-radius: 4px; 
+      position: absolute; bottom: 18vh; right: 4vw; z-index: 3; background-color: #fff; 
+      padding: 0.5vw 2vw; font-family: 'Roboto Condensed', sans-serif; color: #000; 
+      font-size: 5.5vw; font-weight: 900; display: flex; align-items: flex-start; 
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5); border-radius: 4px; 
     }
-    
-    .price-override .cents { 
-      font-size: 2.8vw; 
-      text-decoration: underline; 
-      margin-left: 3px; 
-    }
+    .price-override .cents { font-size: 2.8vw; text-decoration: underline; margin-left: 3px; }
   </style>
 </head>
 <body>
@@ -168,18 +100,10 @@
     const db = firebase.firestore();
 
     const DURACION_SLIDE_MS = 7000;
-    const TRANSICIONES = [
-      { in: "animate__fadeInRight", out: "animate__fadeOutLeft" },
-      { in: "animate__zoomIn", out: "animate__zoomOut" },
-      { in: "animate__flipInX", out: "animate__flipOutX" },
-      { in: "animate__slideInUp", out: "animate__slideOutDown" }
-    ];
-
     const container = document.getElementById("slider-container");
     let productos = [];
     let currentIndex = 0;
     let stepTimeout = null;
-    let transitionIndex = 0;
 
     db.collection("productos").onSnapshot(snapshot => {
       const now = new Date();
@@ -206,7 +130,7 @@
 
       productos.forEach((prod, index) => {
         const slide = document.createElement("div");
-        slide.classList.add("slide", "animate__animated");
+        slide.classList.add("slide");
         if (index === 0) slide.classList.add("active");
 
         const colorTitle = prod.colorTitulo || "#38bdf8";
@@ -216,15 +140,11 @@
           ? `<video src="${prod.imagenUrl}" class="bg-image" autoplay loop muted playsinline crossorigin="anonymous"></video>`
           : `<img src="${prod.imagenUrl}" class="bg-image" crossorigin="anonymous">`;
 
-        let badgeOfertaHTML = "";
+        let badgeHTML = "";
         let legalBannerHTML = "";
 
         if (prod.showOfertaBadge === true) {
-          badgeOfertaHTML = `
-            <div class="badge-oferta-3d animate__animated animate__jackInTheBox animate__delay-1s">
-              <span>¡OFERTA!</span><span class="fire-icon">🔥</span>
-            </div>`;
-
+          badgeHTML = `<div class="badge-oferta-3d"><span>¡OFERTA!</span><span class="fire-icon">🔥</span></div>`;
           let sloganText = "OFERTA VÁLIDA HASTA AGOTAR STOCK";
           if (prod.fechaFinOferta) {
             const parts = prod.fechaFinOferta.split("-");
@@ -232,26 +152,24 @@
               sloganText = `OFERTA VÁLIDA HASTA AGOTAR STOCK O HASTA EL ${parts[2]}/${parts[1]}/${parts[0]} - LO QUE OCURRA ANTES`;
             }
           }
-
-          legalBannerHTML = `
-            <div class="preview-legal-banner animate__animated animate__fadeInUp animate__delay-1s">
-              ${sloganText}
-            </div>`;
+          legalBannerHTML = `<div class="preview-legal-banner">${sloganText}</div>`;
+        } else if (prod.showNuevoBadge === true) {
+          badgeHTML = `<div class="badge-nuevo-3d"><span>¡NUEVO INGRESO!</span><span>✨</span></div>`;
         }
 
         slide.innerHTML = `
-          ${badgeOfertaHTML}
+          ${badgeHTML}
           ${legalBannerHTML}
           ${bgMedia}
           <div class="overlay-content">
-            <div class="title-main animate__animated animate__bounceInLeft animate__delay-1s" style="color: ${colorTitle}">${prod.titulo}</div>
-            <div class="subtitle animate__animated animate__fadeInLeft animate__delay-1s">${prod.subtitulo || ''}</div>
+            <div class="title-main" style="color: ${colorTitle}">${prod.titulo}</div>
+            <div class="subtitle">${prod.subtitulo || ''}</div>
             <div class="details-row">
-              <div class="volume animate__animated animate__fadeInUp animate__delay-1s" style="color: ${colorVol}">${prod.volumen || ''}</div>
-              <div class="pack-info animate__animated animate__fadeInUp animate__delay-1s">${prod.presentacion || ''}</div>
+              <div class="volume" style="color: ${colorVol}">${prod.volumen || ''}</div>
+              <div class="pack-info">${prod.presentacion || ''}</div>
             </div>
           </div>
-          <div class="price-override animate__animated animate__pulse animate__infinite">
+          <div class="price-override">
             $ ${prod.precioEntero}<span class="cents">${prod.precioDecimal || '00'}</span>
           </div>
         `;
@@ -275,21 +193,11 @@
       const slides = document.querySelectorAll(".slide");
       if (slides.length <= 1) return;
 
-      const currentSlide = slides[currentIndex];
-      const effect = TRANSICIONES[transitionIndex];
-
-      currentSlide.className = `slide active animate__animated ${effect.out}`;
-
+      slides[currentIndex].classList.remove("active");
       currentIndex = (currentIndex + 1) % slides.length;
-      transitionIndex = (transitionIndex + 1) % TRANSICIONES.length;
+      slides[currentIndex].classList.add("active");
 
-      const nextSlide = slides[currentIndex];
-
-      setTimeout(() => {
-        currentSlide.classList.remove("active", "animate__animated", effect.out);
-        nextSlide.className = `slide active animate__animated ${effect.in}`;
-        playCurrentSlide();
-      }, 800);
+      playCurrentSlide();
     }
   </script>
 </body>
